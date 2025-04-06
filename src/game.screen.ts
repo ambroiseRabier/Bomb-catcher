@@ -2,6 +2,7 @@ import { Application, Assets, Container, Sprite, Ticker, Text } from 'pixi.js';
 import { Bomb, spawnBomb } from './spawn-bomb';
 import { assets } from './assets';
 import { useGameOverScreen } from './game-over.screen';
+import { screenShake } from './screenshake';
 
 // todo: move that into a config file.
 const TOTAL_LIVES = 9;
@@ -15,6 +16,7 @@ enum GameState {
 export function useGameScreen(app: Application) {
   let loaded = false;
   let inited = false;
+  const SCREEN_SHAKE_FORCE = 50; // 25 max on y or x
   const BOMB_SPAWN_INTERVAL_MS = 1000;
   const container = new Container();
   const lifeText = new Text(TOTAL_LIVES.toString());
@@ -23,12 +25,15 @@ export function useGameScreen(app: Application) {
   const bombs: Bomb[] = [];
   let state = GameState.GameOver;
 
+
   function init() {
     const background = Sprite.from(assets.game.background);
 
     // Background
     background.position.set(app.screen.width/2, app.screen.height/2);
     background.anchor.set(0.5);
+    // Small hack on background image so that screen shake doesn't show white borders
+    background.scale.set((app.screen.width+SCREEN_SHAKE_FORCE) / app.screen.width);
     container.addChild(background);
 
     // Life text
@@ -90,17 +95,33 @@ export function useGameScreen(app: Application) {
 
       if (elapsedTime >= BOMB_SPAWN_INTERVAL_MS) {
         elapsedTime -= BOMB_SPAWN_INTERVAL_MS;
+
+        function onExplode() {
+          lives--;
+          lifeText.text = lives.toString();
+          screenShake(container, SCREEN_SHAKE_FORCE, 2.25);
+          if (lives <= 0) {
+            gameOver();
+          }
+        }
+
         const bomb = spawnBomb({
           app,
-          onExplode: () => {
-            lives--;
-            lifeText.text = lives.toString();
-            if (lives <= 0) {
-              gameOver();
-            }
-          }
+          onExplode,
+          diagonal: false,
         });
         bombs.push(bomb);
+
+        // Small chance of spawning a bomb with a different fall angle
+        const ALSO_SPAWN_DIAGONAL = .25;
+        if (Math.random() < ALSO_SPAWN_DIAGONAL) {
+          const bomb = spawnBomb({
+            app,
+            onExplode,
+            diagonal: true,
+          });
+          bombs.push(bomb);
+        }
       }
     });
     bombSpawnerTicker.start();

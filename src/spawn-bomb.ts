@@ -1,15 +1,18 @@
-import { Application, Circle, Container, Rectangle, Sprite, Ticker } from 'pixi.js';
+import { Application, Circle, Container, Point, Rectangle, Sprite, Ticker } from 'pixi.js';
 import { circRect } from './helpers/collisions';
 import { assets } from './assets';
 import { biasedRandom } from './biased-random';
+import gsap from 'gsap';
 
 
 interface Props {
   app: Application;
   onExplode: () => void;
+  diagonal: boolean;
 }
 
 let previousXRandom = Math.random();
+let previousFirstAngleSign = Math.random() > 0 ? 1 : -1;
 
 enum BombState {
   Idle = 'Idle',
@@ -20,13 +23,14 @@ enum BombState {
 
 export type Bomb = ReturnType<typeof spawnBomb>;
 
-export function spawnBomb({app, onExplode}: Props) {
+export function spawnBomb({app, onExplode, diagonal}: Props) {
   // Note: PIXI internally cache the sprite, that means no overhead in calling this multiple times :)
   const sprite = Sprite.from(assets.game.bomb);
   const exploSprite = Sprite.from(assets.game.explosion);
   const container = new Container();
-  const touchHitBox = new Circle(0, 0, 60);
-  const explodeHitBox = new Circle(0, 0, 40);
+  // Bomb sprite is 42px radius.
+  const TOUCH_HITBOX = new Circle(0, 0, 48);
+  const explodeHitBox = new Circle(0, 0, 38);
 
   // Fall time (easier to reason with than pixels per second speed)
   const INITIAL_FALL_TIME_SEC = 6;
@@ -37,6 +41,8 @@ export function spawnBomb({app, onExplode}: Props) {
 
   let updateTicker: Ticker;
   let state = BombState.Idle;
+  // Fall to the bottom by default
+  let fallVector = new Point(0, 1);
 
   init();
 
@@ -44,11 +50,14 @@ export function spawnBomb({app, onExplode}: Props) {
 
     // Instead of rectangle bounding box clickable zone, we use a circle, that should be
     // slightly bigger than the sprite.
-    container.hitArea = touchHitBox;
+    container.hitArea = TOUCH_HITBOX;
     container.cursor = 'pointer';
     container.on('pointerdown', catchedState);
 
-    sprite.anchor.set(0.5);
+    // Bomb sprite anchor needs to be on the center of the bomb, not the bomb fuse.
+    // This allows proper rotation to be visible
+    // Sprite is 85*145, bomb radius is 42
+    sprite.anchor.set(0.5, 1 - (42/145));
     container.addChild(sprite);
 
     exploSprite.anchor.set(0.5);
@@ -90,7 +99,18 @@ export function spawnBomb({app, onExplode}: Props) {
     if (!explode) {
       // Move downward
       // Approximate total fall height to screen.height.
-      container.position.y += (app.screen.height / INITIAL_FALL_TIME_SEC) * (app.ticker.deltaMS / 1000);
+      // Note: fall time is for a straight vertical line, diagonal bombs will take more time.
+      const speed = (app.screen.height / INITIAL_FALL_TIME_SEC) * (app.ticker.deltaMS / 1000);
+      container.position.y += fallVector.y * speed;
+      container.position.x += fallVector.x * speed;
+
+      // Bounce off edge to avoid being unclickable
+      const right = container.position.x + TOUCH_HITBOX.radius > app.screen.width;
+      const left = container.position.x - TOUCH_HITBOX.radius < 0;
+      if (right || left) {
+        fallVector.x *= -1;
+        gsap.to(container.scale, {x: -container.scale.x, duration: 0.15, ease: 'power2.inOut'})
+      }
     } else {
       // Remove one live
       explodeState(); // todo state handling, each his coroutine ?
@@ -120,7 +140,6 @@ export function spawnBomb({app, onExplode}: Props) {
     disable();
   }
 
-
   function enable() {
     state = BombState.Falling;
     sprite.visible = true;
@@ -130,7 +149,7 @@ export function spawnBomb({app, onExplode}: Props) {
     container.interactive = true;
 
     // Initial position
-    container.position.y = -sprite.height*2;
+    container.position.y = -sprite.height * 1.1;
     const HORIZONTAL_SPAWN_MARGIN_PX = 50;
     const rand = biasedRandom({
       min: 0,
@@ -139,7 +158,29 @@ export function spawnBomb({app, onExplode}: Props) {
       avoidRange: 0.15,
       avoidProbability: 0.75,
     });
+    previousXRandom = rand;
     container.position.x = HORIZONTAL_SPAWN_MARGIN_PX + rand * (app.screen.width - HORIZONTAL_SPAWN_MARGIN_PX*2 - sprite.width);
+    sprite.angle = (Math.random() * 2 - 1) * 20; // visual variation
+
+
+    // Move in diagonal
+    // Funner if it appears in addition and not in replacement of another bomb.
+    if (diagonal) {
+      const degToRad = Math.PI / 180;
+      const radToDeg = 180 / Math.PI;
+      const angleMin = 30;
+      const angleMax = 60;
+
+      // It looks better when angle sign varies at (almost) each bomb
+      const SAME_SIGN_PROBABILITY = 0.20;
+      const sign = Math.random() < SAME_SIGN_PROBABILITY ? previousFirstAngleSign : -previousFirstAngleSign;
+      const fallAngle = sign * (
+        angleMin + Math.random() * (angleMax - angleMin)
+      ) + 90; // 90 because 0 deg angle is pointing right side
+      fallVector = new Point(Math.cos(fallAngle*degToRad), Math.sin(fallAngle*degToRad));
+      sprite.angle = fallAngle - 90;
+    }
+
 
     updateTicker = new Ticker();
     updateTicker.add(update);

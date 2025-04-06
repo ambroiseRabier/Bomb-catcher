@@ -7,6 +7,7 @@ interface Props {
 }
 
 export function useTitleScreen({app, playClick}: Props) {
+  let loaded = false;
   let inited = false;
   const container = new Container();
 
@@ -45,13 +46,19 @@ export function useTitleScreen({app, playClick}: Props) {
   }
 
   return {
-    load: () => {
-      return Assets.load(Object.values(assets.titlescreen));
+    load: async () => {
+      await Assets.load(Object.values(assets.titlescreen));
+      loaded = true;
     },
     /**
      * Make sure to call load first.
      */
     enable: () => {
+      // Safeguard
+      if (!loaded) {
+        throw new Error('Game screen not loaded');
+      }
+      // auto-init
       if (!inited) {
         init();
         inited = true;

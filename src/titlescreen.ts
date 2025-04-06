@@ -1,4 +1,5 @@
-import { Application, Container, Sprite } from 'pixi.js';
+import { Application, Assets, Container, Sprite } from 'pixi.js';
+import { assets } from './assets';
 
 interface Props {
   app: Application;
@@ -6,47 +7,61 @@ interface Props {
 }
 
 export function useTitleScreen({app, playClick}: Props) {
-  // Negligible sync loading time (otherwise we would need a loading screen)
-  const background = Sprite.from('/placeholders/titlescreen/Background.PNG');
-  const playBtn = Sprite.from('/placeholders/titlescreen/PlayBtn.PNG');
-  const title = Sprite.from('/placeholders/titlescreen/Title.PNG');
-
+  let inited = false;
   const container = new Container();
 
-  // Ideally, positioning is done in some kind of editor.
-  container.addChild(background);
+  function init() {
+    // Negligible sync loading time (otherwise we would need a loading screen)
+    const background = Sprite.from(assets.titlescreen.background);
+    const playBtn = Sprite.from(assets.titlescreen.playBtn);
+    const title = Sprite.from(assets.titlescreen.title);
 
-  // Title
-  title.anchor.set(0.5, 0);
-  title.position.set(app.screen.width/2, 100);
-  container.addChild(title);
+    // Ideally, positioning is done in some kind of editor.
+    container.addChild(background);
 
-  // PlayBtn
-  playBtn.anchor.set(0.5, 1);
-  playBtn.position.set(app.screen.width/2, app.screen.height - 100);
-  playBtn.interactive = true;
-  playBtn.buttonMode = true;
-  playBtn.on('pointerdown', () => {
-    // anim then
-    playClick();
-  });
-  playBtn.on('mouseover', () => {
-    playBtn.tint = 0x9acd32; // Slightly change color on hover
-  });
-  playBtn.on('mouseout', () => {
-    playBtn.tint = 0xFFFFFF; // Reset tint when no longer hovering
-  });
-  container.addChild(playBtn);
+    // Title
+    title.anchor.set(0.5, 0);
+    title.position.set(app.screen.width/2, 100);
+    container.addChild(title);
 
-  container.visible = false;
-  app.stage.addChild(container);
+    // PlayBtn
+    playBtn.anchor.set(0.5, 1);
+    playBtn.position.set(app.screen.width/2, app.screen.height - 100);
+    playBtn.interactive = true;
+    playBtn.cursor = 'pointer';
+    playBtn.on('pointerdown', () => {
+      // anim then
+      playClick();
+    });
+    playBtn.on('mouseover', () => {
+      playBtn.tint = 0x9acd32; // Slightly change color on hover
+    });
+    playBtn.on('mouseout', () => {
+      playBtn.tint = 0xFFFFFF; // Reset tint when no longer hovering
+    });
+    container.addChild(playBtn);
+
+    app.stage.addChild(container);
+  }
 
   return {
+    load: () => {
+      return Assets.load(Object.values(assets.titlescreen));
+    },
+    /**
+     * Make sure to call load first.
+     */
     enable: () => {
+      if (!inited) {
+        init();
+        inited = true;
+      }
       container.visible = true;
+      container.interactive = true;
     },
     disable: () => {
       container.visible = false;
+      container.interactive = false;
     }
   }
 }

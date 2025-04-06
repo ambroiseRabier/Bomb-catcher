@@ -1,4 +1,4 @@
-import {AnimatedSprite, BaseTexture, Spritesheet} from 'pixi.js';
+import { AnimatedSprite, Assets, Spritesheet } from 'pixi.js';
 
 
 /**
@@ -40,21 +40,22 @@ import {AnimatedSprite, BaseTexture, Spritesheet} from 'pixi.js';
  *
  * ```
  */
-export function loadAnimatedSprite(png: string, json: any): Promise<AnimatedSprite> {
-  return new Promise<AnimatedSprite>((resolve, reject) => {
-    const baseTexture = new BaseTexture(png);
+export async function loadAnimatedSprite(png: string, json: any): Promise<AnimatedSprite> {
+  try {
+    // Load the image (BaseTexture) using Assets.load
+    const baseTexture = await Assets.load(png);
+
+    // Create the spritesheet using the loaded BaseTexture and JSON data
     const spritesheet = new Spritesheet(baseTexture, json);
 
-    spritesheet.parse(function (textures) {
-      // Callback: finished preparing spritesheet textures
+    // Parse the spritesheet to generate textures
+    await spritesheet.parse();
 
-      if (!textures) {
-        reject('Textures undefined, go check your parameters.');
-      } else {
-        const turret = new AnimatedSprite(Object.values(textures));
+    // Create an AnimatedSprite from the parsed textures
+    const animatedSprite = new AnimatedSprite(Object.values(spritesheet.textures));
 
-        resolve(turret);
-      }
-    });
-  });
+    return animatedSprite;
+  } catch (error) {
+    throw new Error(`Failed to load animated sprite: ${error}`);
+  }
 }

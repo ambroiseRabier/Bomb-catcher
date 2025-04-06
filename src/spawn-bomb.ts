@@ -1,10 +1,16 @@
 import { Application, Circle, Container, Rectangle, Sprite, Ticker } from 'pixi.js';
 import { circRect } from './helpers/collisions';
+import { assets } from './assets';
 
 
-export function spawnBomb(app: Application) {
+interface Props {
+  app: Application;
+  onExplode: () => void;
+}
+
+export function spawnBomb({app, onExplode}: Props) {
   // Note: PIXI internally cache the sprite, that means no overhead in calling this multiple times :)
-  const sprite = Sprite.from('/placeholders/game/Bomb.PNG'); // todo better constant links
+  const sprite = Sprite.from(assets.game.bomb); // todo better constant links
   const container = new Container();
   const touchHitBox = new Circle(0, 0, 60);
   const explodeHitBox = new Circle(0, 0, 40);
@@ -25,6 +31,8 @@ export function spawnBomb(app: Application) {
 
     container.addChild(sprite);
     app.stage.addChild(container);
+    // container.cursor = 'pointer'; maybe, we'll see with hitboxes
+
     enable();
     // disable(); // todo pooling.
   }
@@ -36,7 +44,7 @@ export function spawnBomb(app: Application) {
       // Approximate total fall height to screen.height.
       container.position.y += (app.screen.height / INITIAL_FALL_TIME_SEC) * (app.ticker.deltaMS / 1000);
     } else {
-      console.log('explode');
+      onExplode();
     }
   }
 

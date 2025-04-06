@@ -1,4 +1,7 @@
 module.exports = {
+  experiments: {
+    topLevelAwait: true
+  },
   mode: "development",
   devtool: "inline-source-map",
   entry: "./src/index.ts",

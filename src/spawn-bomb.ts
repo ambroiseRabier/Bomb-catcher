@@ -22,7 +22,8 @@ export type Bomb = ReturnType<typeof spawnBomb>;
 
 export function spawnBomb({app, onExplode}: Props) {
   // Note: PIXI internally cache the sprite, that means no overhead in calling this multiple times :)
-  const sprite = Sprite.from(assets.game.bomb); // todo better constant links
+  const sprite = Sprite.from(assets.game.bomb);
+  const exploSprite = Sprite.from(assets.game.explosion);
   const container = new Container();
   const touchHitBox = new Circle(0, 0, 60);
   const explodeHitBox = new Circle(0, 0, 40);
@@ -50,6 +51,9 @@ export function spawnBomb({app, onExplode}: Props) {
     sprite.anchor.set(0.5);
     container.addChild(sprite);
 
+    exploSprite.anchor.set(0.5);
+    container.addChild(exploSprite);
+
     app.stage.addChild(container);
 
     enable();
@@ -73,8 +77,6 @@ export function spawnBomb({app, onExplode}: Props) {
     // Animate
     await new Promise(resolve => setTimeout(resolve, 1000));
     disable();
-
-
 
     // todo: each state, in and out (, param fromState ?)
   }
@@ -104,6 +106,9 @@ export function spawnBomb({app, onExplode}: Props) {
     }
     state = BombState.Exploding;
 
+    sprite.visible = false;
+    exploSprite.visible = true;
+
     // Stop update loop
     updateTicker.stop();
 
@@ -118,6 +123,8 @@ export function spawnBomb({app, onExplode}: Props) {
 
   function enable() {
     state = BombState.Falling;
+    sprite.visible = true;
+    exploSprite.visible = false;
 
     container.visible = true;
     container.interactive = true;
@@ -129,7 +136,7 @@ export function spawnBomb({app, onExplode}: Props) {
       min: 0,
       max: 1,
       previous: previousXRandom,
-      avoidRange: 0.1,
+      avoidRange: 0.15,
       avoidProbability: 0.75,
     });
     container.position.x = HORIZONTAL_SPAWN_MARGIN_PX + rand * (app.screen.width - HORIZONTAL_SPAWN_MARGIN_PX*2 - sprite.width);

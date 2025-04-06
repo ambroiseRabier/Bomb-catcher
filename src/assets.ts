@@ -9,5 +9,6 @@ export const assets = {
   game: {
     background: '/placeholders/game/Background.PNG',
     bomb: '/placeholders/game/Bomb.PNG',
+    explosion: '/placeholders/game/Explosion.PNG',
   }
 }

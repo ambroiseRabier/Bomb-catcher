@@ -10,7 +10,7 @@ export function useGameOverScreen({app, retryClick}: { app: Application, retryCl
 
   const style = new TextStyle({
     fontFamily: 'Arial',
-    fontSize: 48,
+    fontSize: 72,
     fontWeight: 'bold',
     align: 'center',
     fill: { fill }, // fillGradientType for dir

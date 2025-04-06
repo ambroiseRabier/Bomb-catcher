@@ -22,6 +22,7 @@ export function spawnBomb(app: Application) {
 
   function init() {
     sprite.anchor.set(0.5);
+
     container.addChild(sprite);
     app.stage.addChild(container);
     enable();

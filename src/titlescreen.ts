@@ -6,7 +6,7 @@ interface Props {
 }
 
 export function useTitleScreen({app, playClick}: Props) {
-  // Negligible sync loading time
+  // Negligible sync loading time (otherwise we would need a loading screen)
   const background = Sprite.from('/placeholders/titlescreen/Background.PNG');
   const playBtn = Sprite.from('/placeholders/titlescreen/PlayBtn.PNG');
   const title = Sprite.from('/placeholders/titlescreen/Title.PNG');

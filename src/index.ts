@@ -25,7 +25,8 @@ document.body.appendChild(app.view);
 const gameScreen = useGameScreen(app);
 const titleScreen = useTitleScreen({
   app,
-  playClick: () => {
+  playClick: async () => {
+    await gameScreen.preload(); // tod could be while an animation run.
     titleScreen.disable();
     gameScreen.enable();
   }

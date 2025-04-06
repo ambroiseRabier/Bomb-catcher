@@ -1,13 +1,15 @@
-import { Application, Container, Sprite } from 'pixi.js';
+import { Application, Container, Loader, Sprite } from 'pixi.js';
 import { spawnBomb } from './spawn-bomb';
 
 
 export function useGameScreen(app: Application) {
   // Negligible sync loading time
-  const background = Sprite.from('/placeholders/Background.PNG');
-
+  const background = Sprite.from('/placeholders/game/Background.PNG');
   const container = new Container();
 
+
+  background.position.set(0,0);
+  background.anchor.set(0,0);
   container.addChild(background);
   app.stage.addChild(container);
 
@@ -19,10 +21,24 @@ export function useGameScreen(app: Application) {
 
 
   return {
+    /**
+     * We need to preload some assets to make sure the sprite doesn't return 1 px in size.
+     */
+    async preload() {
+      return new Promise<void>((resolve, reject) => {
+        const loader = new Loader();
+        // todo: maybe put into gameSprite.ts which provide all sprite in an object.
+        loader.add('bomb', '/placeholders/game/Bomb.PNG');
+        loader.load(() => {
+          resolve();
+        });
+      });
+    },
     enable() {
-      setInterval(() => {
         spawnBomb(app);
-      },500);
+      // setInterval(() => {
+      //   spawnBomb(app);
+      // },500);
     }
   }
 }

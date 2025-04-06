@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "@tauri-apps/api": "^1.0.0-rc.1",
+    "gsap": "^3.12.7",
     "pixi.js": "^6.2.2"
   },
   "devDependencies": {

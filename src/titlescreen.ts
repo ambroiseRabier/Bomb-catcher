@@ -1,7 +1,11 @@
 import { Application, Container, Sprite } from 'pixi.js';
 
+interface Props {
+  app: Application;
+  playClick: () => void;
+}
 
-export function useTitleScreen(app: Application, playClick: () => void) {
+export function useTitleScreen({app, playClick}: Props) {
   // Negligible sync loading time
   const background = Sprite.from('/placeholders/titlescreen/Background.PNG');
   const playBtn = Sprite.from('/placeholders/titlescreen/PlayBtn.PNG');

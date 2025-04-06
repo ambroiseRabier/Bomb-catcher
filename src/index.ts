@@ -7,6 +7,7 @@ import spaceshipPNG from './spaceship.png';
 import {Application, Sprite} from 'pixi.js';
 import { setBasicOptions } from './helpers/set-basic-options';
 import { useTitleScreen } from './titlescreen';
+import { useGameScreen } from './gamescreen';
 
 
 const app = new Application({
@@ -15,12 +16,20 @@ const app = new Application({
   height: 1280,
   backgroundColor: 0xEEEEEE
 });
+// If we have less space, downscale, if we have more, don't upscale.
+app.view.style.height = 'min(1280px, 100vh)';
 
 setBasicOptions(app);
 document.body.appendChild(app.view);
 
-//const gameScreen = ;
-const titleScreen = useTitleScreen(app, () => {});
+const gameScreen = useGameScreen(app);
+const titleScreen = useTitleScreen({
+  app,
+  playClick: () => {
+    titleScreen.disable();
+    gameScreen.enable();
+  }
+});
 
 titleScreen.enable();
 

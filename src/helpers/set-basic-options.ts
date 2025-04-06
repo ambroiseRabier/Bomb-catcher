@@ -6,5 +6,6 @@ export function setBasicOptions(app: Application) {
   app.ticker.maxFPS = 144;
 
   // resize so that the entire canvas always stay visible. Should not impact gameplay.
-  app.view.style.width = 'min(100vw, 960px)';
+  // should be combined with overflow: hidden, as browser is 4px bigger for an unknown reason.
+  app.view.style.height = 'max(500px, 100vh);';
 }

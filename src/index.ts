@@ -9,11 +9,12 @@ import { setBasicOptions } from './helpers/set-basic-options';
 
 
 const app = new Application({
-  // You should also update tauri.config.json is you change width or height.
-  width: 800,
-  height: 600,
-  backgroundColor: 0xEEEEEE // Put 0x000000 for black
+  // You should also update tauri.conf.json is you change width or height.
+  width: 720,
+  height: 1280,
+  backgroundColor: 0xEEEEEE
 });
+
 setBasicOptions(app);
 document.body.appendChild(app.view);
 

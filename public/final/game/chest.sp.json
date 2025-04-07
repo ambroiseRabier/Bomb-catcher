@@ -1,0 +1,39 @@
+{"frames": {
+
+"frame0000.png":
+{
+	"frame": {"x":196,"y":1,"w":168,"h":152},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":34,"y":59,"w":168,"h":152},
+	"sourceSize": {"w":219,"h":211}
+},
+"frame0001.png":
+{
+	"frame": {"x":350,"y":1,"w":151,"h":136},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":41,"y":73,"w":151,"h":136},
+	"sourceSize": {"w":219,"h":211}
+},
+"frame0002.png":
+{
+	"frame": {"x":1,"y":1,"w":193,"h":169},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":16,"y":42,"w":193,"h":169},
+	"sourceSize": {"w":219,"h":211}
+}},
+"animations": {
+	"frame": ["frame0000.png","frame0001.png","frame0002.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "chest.sp.png",
+	"format": "RGBA8888",
+	"size": {"w":487,"h":171},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:52a297631d9988abd321e37fbe2c3bd8:127e5d24bb60ce302c6e4127ebf5500d:d0951faa14b608797f96616a345e52d5$"
+}
+}

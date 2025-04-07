@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Sprite, Ticker, Text, Point } from 'pixi.js';
+import { Application, Assets, Container, Sprite, Ticker, Text, Point, Spritesheet, AnimatedSprite } from 'pixi.js';
 import { Bomb, spawnBomb } from './spawn-bomb';
 import { assets } from './assets';
 import { useGameOverScreen } from './game-over.screen';
@@ -8,6 +8,7 @@ import settings from './settings';
 import { ShockwaveFilter } from 'pixi-filters';
 import gsap from 'gsap';
 import { useRainbow } from './rainbow';
+import { useChest } from './chest';
 
 const shockwaveFilter = new ShockwaveFilter({
   center: new Point(100, 100),
@@ -40,6 +41,7 @@ export function useGameScreen(app: Application) {
    */
   const gameTime = useGameTime(app);
   const rainbow = useRainbow();
+  let chest: ReturnType<typeof useChest>;
 
   function init() {
     const background = Sprite.from(assets.game.background);
@@ -55,6 +57,13 @@ export function useGameScreen(app: Application) {
     // Rainbow
     rainbow.container.position.set(app.screen.width / 2, app.screen.height + 5); // 5 offset
     container.addChild(rainbow.container);
+
+    // Sprite needs to be loaded first.
+    chest = useChest();
+    // Placing the chest correctly is a pain since I've scaled the background for screenshake,
+    // Should have made the background bigger from the start :/
+    chest.container.position.set(app.screen.width / 2-5, app.screen.height - 75);
+    container.addChild(chest.container);
 
     // Life text
     lifeText.anchor.set(0.5);
@@ -139,8 +148,11 @@ export function useGameScreen(app: Application) {
       function onExplode(explosionAnim: Promise<void>, pos: Point) {
         lives--;
         // max 7 bows to remove.
-        if (settings.lives - lives <= 7) {
+        if (lives <= 8 && lives >= 2) {
           rainbow.loseBow();
+        }
+        if (lives < 2 && lives >= 0) {
+          chest.loseLive();
         }
         lifeText.text = lives.toString();
         screenShake(container, SCREEN_SHAKE_FORCE, 0.2);
@@ -197,6 +209,7 @@ export function useGameScreen(app: Application) {
 
     lives = settings.lives;
     rainbow.reset();
+    chest.reset();
     lifeText.text = lives.toString();
     app.ticker.add(bombSpawnTick);
   }

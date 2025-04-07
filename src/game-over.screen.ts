@@ -1,4 +1,5 @@
 import { Application, Container, FillGradient, Graphics, Text, TextStyle } from 'pixi.js';
+import gsap from 'gsap';
 
 export function useGameOverScreen({app, retryClick}: { app: Application, retryClick: () => void }) {
   const container = new Container();
@@ -7,6 +8,8 @@ export function useGameOverScreen({app, retryClick}: { app: Application, retryCl
   background.drawRect(0, 0, app.screen.width, app.screen.height);
   background.endFill();
   const fill = new FillGradient(0, 0, 0, 10);
+  fill.addColorStop(0, 0x000000);
+  fill.addColorStop(0, 0xFFFFFF);
 
   const style = new TextStyle({
     fontFamily: 'Arial',
@@ -30,7 +33,16 @@ export function useGameOverScreen({app, retryClick}: { app: Application, retryCl
     style,
   });
 
-  const retryText = new Text({ text: 'Try again?' });
+  const retryStyle = new TextStyle({
+    fontFamily: 'Arial',
+    fontSize: 42,
+    fontWeight: 'bold',
+    align: 'center',
+    fill: '#e8e8e8',
+    wordWrapWidth: app.screen.width * 0.8, // 10% margin each side
+  });
+
+  const retryText = new Text({ text: 'Try again?', style: retryStyle });
 
   background.position.set(0);
   container.addChild(background);
@@ -55,17 +67,45 @@ export function useGameOverScreen({app, retryClick}: { app: Application, retryCl
    */
   let _parent: Container;
 
+  // todo animations
+  // fade in of background,
+  // and game over falls from the sky, heavily.
+  // score shows immediately bellow
+  // after a second or two, show "try again ?" button
+  function animate() {
+    gsap.fromTo(container, { alpha: 0 }, { alpha: 1, duration: 0.1 });
+    gsap.fromTo(retryText, { y: app.screen.height + retryText.height, alpha: 0.8 }, { alpha: 1, y: app.screen.height - 200, duration: 1, delay: 1 })
+      .then(() => {
+        gsap.fromTo(retryText.scale, {x:1,y:1}, {
+          delay: 10,
+          duration: 1,
+          x: 1.1,
+          y: 1.1,
+          yoyo: true,
+          repeat: -1,
+          ease: "sine.inOut"
+        });
+      });
+    gsap.fromTo(gameOverText, { y: -gameOverText.height }, {
+      y: 200,
+      delay: .5,
+      duration: .5,
+      ease: CustomBounce.create("myBounce", {
+        strength: 0.35,
+        endAtStart: false,
+        squash: 1,
+        squashID: "myBounce-squash"
+      })
+    });
+  }
+
   return {
-    // todo animations
-    // fade in of background,
-    // and game over falls from the sky, heavily.
-    // score shows immediately bellow
-    // after a second or two, show "try again ?" button
     enable(parent: Container) {
       _parent = parent;
       parent.addChild(container);
       container.visible = true;
       container.interactive = true;
+      animate();
     },
     disable() {
       _parent.removeChild(container);

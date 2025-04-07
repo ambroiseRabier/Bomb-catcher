@@ -7,8 +7,9 @@ import gsap from 'gsap';
 
 interface Props {
   app: Application;
-  onExplode: () => void;
+  onExplode: (explosionAnim: Promise<void>) => void;
   diagonal: boolean;
+  fallTimeSec: number;
 }
 
 let previousXRandom = Math.random();
@@ -23,7 +24,13 @@ enum BombState {
 
 export type Bomb = ReturnType<typeof spawnBomb>;
 
-export function spawnBomb({app, onExplode, diagonal}: Props) {
+export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
+  // Safeguard against wrong formulas.
+  if (fallTimeSec <= 0) {
+    throw new Error('fallTime must be > 0');
+  }
+  console.log('fallTimeSec ' + fallTimeSec);
+
   // Note: PIXI internally cache the sprite, that means no overhead in calling this multiple times :)
   const sprite = Sprite.from(assets.game.bomb);
   const exploSprite = Sprite.from(assets.game.explosion);
@@ -32,8 +39,6 @@ export function spawnBomb({app, onExplode, diagonal}: Props) {
   const TOUCH_HITBOX = new Circle(0, 0, 48);
   const explodeHitBox = new Circle(0, 0, 38);
 
-  // Fall time (easier to reason with than pixels per second speed)
-  const INITIAL_FALL_TIME_SEC = 6;
 
   // todo: likely need to move that elsewhere
   // Add screen height to the rectangle to avoid missing collision on fast moving objects.
@@ -47,7 +52,6 @@ export function spawnBomb({app, onExplode, diagonal}: Props) {
   init();
 
   function init() {
-
     // Instead of rectangle bounding box clickable zone, we use a circle, that should be
     // slightly bigger than the sprite.
     container.hitArea = TOUCH_HITBOX;
@@ -75,16 +79,35 @@ export function spawnBomb({app, onExplode, diagonal}: Props) {
       throw new Error(`Explode state called with wrong state ${state}`);
     }
     state = BombState.Catched;
+
+    // todo
     // move out of screen with a bounce, while scaling down a bit (ease fc type log)
     // and a strong rotation
-    // maybe explosion in background ?
-    container.position.y = -sprite.height*2; // good temp solution
 
     updateTicker.stop(); // todo: should be a cleanup handled where we add that state initially
     container.interactive = false;
 
     // Animate
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await Promise.race([
+      gsap.to(container.scale, {x: 0.1, y: 0.1, duration: 1, ease: 'circ.out', yoyo: true}),
+      gsap.to(container, {
+        angle: (Math.random() * 500 + 400) * (Math.random() > 0.5 ? 1 : -1),
+        duration: 1.33, // don't want it to stop spinning before it disappear
+        ease: 'power2.out',
+      }),
+      gsap.to(container, {
+        y: container.position.y - 100,
+        duration: 1,
+        ease: 'back.out(4)',
+      }),
+      gsap.to(container, {
+        x: container.position.x + (40 * Math.random() + 20) * (container.position.x > app.screen.width / 2 ? 1 : -1),
+        duration: 1,
+        ease: 'power1.out',
+      }),
+    ]);
+
+
     disable();
 
     // todo: each state, in and out (, param fromState ?)
@@ -100,7 +123,8 @@ export function spawnBomb({app, onExplode, diagonal}: Props) {
       // Move downward
       // Approximate total fall height to screen.height.
       // Note: fall time is for a straight vertical line, diagonal bombs will take more time.
-      const speed = (app.screen.height / INITIAL_FALL_TIME_SEC) * (app.ticker.deltaMS / 1000);
+      // Note: This has the downside of making the game harder on big screens.
+      const speed = (app.screen.height / fallTimeSec) * (app.ticker.deltaMS/1000);
       container.position.y += fallVector.y * speed;
       container.position.x += fallVector.x * speed;
 
@@ -113,9 +137,9 @@ export function spawnBomb({app, onExplode, diagonal}: Props) {
       }
     } else {
       // Remove one live
-      explodeState(); // todo state handling, each his coroutine ?
+      const explosionAnim = explodeState(); // todo state handling, each his coroutine ?
       // Call right after state has been changed to Exploding or explodeState will be called twice for this bomb.
-      onExplode();
+      onExplode(explosionAnim);
     }
   }
 
@@ -126,9 +150,6 @@ export function spawnBomb({app, onExplode, diagonal}: Props) {
     }
     state = BombState.Exploding;
 
-    sprite.visible = false;
-    exploSprite.visible = true;
-
     // Stop update loop
     updateTicker.stop();
 
@@ -136,6 +157,8 @@ export function spawnBomb({app, onExplode, diagonal}: Props) {
     container.interactive = false;
 
     // Animate
+    sprite.visible = false;
+    exploSprite.visible = true;
     await new Promise(resolve => setTimeout(resolve, 1000));
     disable();
   }

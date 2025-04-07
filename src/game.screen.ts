@@ -3,6 +3,8 @@ import { Bomb, spawnBomb } from './spawn-bomb';
 import { assets } from './assets';
 import { useGameOverScreen } from './game-over.screen';
 import { screenShake } from './screenshake';
+import { useGameTime } from './game-time';
+import settings from './settings';
 
 // todo: move that into a config file.
 const TOTAL_LIVES = 9;
@@ -24,6 +26,11 @@ export function useGameScreen(app: Application) {
   let bombSpawnerTicker: Ticker;
   const bombs: Bomb[] = [];
   let state = GameState.GameOver;
+  /**
+   * Since how long the game has started.
+   * In ms.
+   */
+  const gameTime = useGameTime(app);
 
 
   function init() {
@@ -33,7 +40,7 @@ export function useGameScreen(app: Application) {
     background.position.set(app.screen.width/2, app.screen.height/2);
     background.anchor.set(0.5);
     // Small hack on background image so that screen shake doesn't show white borders
-    background.scale.set((app.screen.width+SCREEN_SHAKE_FORCE) / app.screen.width);
+    background.scale.set((app.screen.width+SCREEN_SHAKE_FORCE*2) / app.screen.width);
     container.addChild(background);
 
     // Life text
@@ -62,7 +69,10 @@ export function useGameScreen(app: Application) {
     }
     state = GameState.GameOver;
 
+    gameTime.end();
+
     // Stop spawning bombs
+    bombSpawnerTicker.stop();
     bombSpawnerTicker.destroy();
 
     // Clear screen and animate
@@ -80,6 +90,8 @@ export function useGameScreen(app: Application) {
     }
     state = GameState.Playing;
 
+    gameTime.start();
+
     lives = TOTAL_LIVES;
     lifeText.text = lives.toString();
     let elapsedTime = 0;
@@ -96,12 +108,14 @@ export function useGameScreen(app: Application) {
       if (elapsedTime >= BOMB_SPAWN_INTERVAL_MS) {
         elapsedTime -= BOMB_SPAWN_INTERVAL_MS;
 
-        function onExplode() {
+        function onExplode(explosionAnim: Promise<void>) {
           lives--;
           lifeText.text = lives.toString();
-          screenShake(container, SCREEN_SHAKE_FORCE, 2.25);
+          screenShake(container, SCREEN_SHAKE_FORCE, 0.2);
           if (lives <= 0) {
-            gameOver();
+            // Waiting for explosion to finish is a little dramatic touch
+            // and also avoid screenshake to misplace the game over screen.
+            explosionAnim.then(() => gameOver());
           }
         }
 
@@ -109,6 +123,7 @@ export function useGameScreen(app: Application) {
           app,
           onExplode,
           diagonal: false,
+          fallTimeSec: settings.bomb.fallTimeSec(gameTime.elapsedTime),
         });
         bombs.push(bomb);
 
@@ -119,6 +134,7 @@ export function useGameScreen(app: Application) {
             app,
             onExplode,
             diagonal: true,
+            fallTimeSec: settings.bomb.fallTimeSec(gameTime.elapsedTime),
           });
           bombs.push(bomb);
         }
@@ -133,7 +149,7 @@ export function useGameScreen(app: Application) {
      * Also since switching from PIXI 6 to 8, that's a requirement.
      */
     async load() {
-      await Assets.load(Object.values(assets.game)).then((a)=> console.log(a));
+      await Assets.load(Object.values(assets.game));
       loaded = true;
     },
 

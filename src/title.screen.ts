@@ -6,7 +6,7 @@ interface Props {
   playClick: () => void;
 }
 
-export function useTitleScreen({app, playClick}: Props) {
+export function useTitleScreen({ app, playClick }: Props) {
   let loaded = false;
   let inited = false;
   const container = new Container();
@@ -22,12 +22,12 @@ export function useTitleScreen({app, playClick}: Props) {
 
     // Title
     title.anchor.set(0.5, 0);
-    title.position.set(app.screen.width/2, 100);
+    title.position.set(app.screen.width / 2, 100);
     container.addChild(title);
 
     // PlayBtn
     playBtn.anchor.set(0.5, 1);
-    playBtn.position.set(app.screen.width/2, app.screen.height - 100);
+    playBtn.position.set(app.screen.width / 2, app.screen.height - 100);
     playBtn.interactive = true;
     playBtn.cursor = 'pointer';
     playBtn.on('pointerdown', () => {
@@ -38,7 +38,7 @@ export function useTitleScreen({app, playClick}: Props) {
       playBtn.tint = '#EFBF04';
     });
     playBtn.on('mouseout', () => {
-      playBtn.tint = 0xFFFFFF;
+      playBtn.tint = 0xffffff;
     });
     container.addChild(playBtn);
 
@@ -69,6 +69,6 @@ export function useTitleScreen({app, playClick}: Props) {
     disable: () => {
       container.visible = false;
       container.interactive = false;
-    }
-  }
+    },
+  };
 }

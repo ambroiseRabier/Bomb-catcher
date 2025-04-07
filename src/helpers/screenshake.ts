@@ -5,8 +5,8 @@ export function screenShake(cameraContainer: Container, intensity: number, durat
   const originalX = cameraContainer.x;
   const originalY = cameraContainer.y;
 
-  const randX = (Math.random() - 0.3);
-  const randY = (Math.random() - 0.3);
+  const randX = Math.random() - 0.3;
+  const randY = Math.random() - 0.3;
   gsap.to(cameraContainer, {
     // Add a minimum value so we don't have screenshake where nothing happen.
     x: originalX + (randX + Math.sign(randX) * 0.2) * intensity,

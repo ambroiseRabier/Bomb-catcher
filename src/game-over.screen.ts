@@ -1,7 +1,13 @@
 import { Application, Container, FillGradient, Graphics, Text, TextStyle } from 'pixi.js';
 import gsap from 'gsap';
 
-export function useGameOverScreen({app, retryClick}: { app: Application, retryClick: () => void }) {
+export function useGameOverScreen({
+  app,
+  retryClick,
+}: {
+  app: Application;
+  retryClick: () => void;
+}) {
   const container = new Container();
   const background = new Graphics();
   background.beginFill(0x000000, 0.5);
@@ -9,7 +15,7 @@ export function useGameOverScreen({app, retryClick}: { app: Application, retryCl
   background.endFill();
   const fill = new FillGradient(0, 0, 0, 10);
   fill.addColorStop(0, 0x000000);
-  fill.addColorStop(0, 0xFFFFFF);
+  fill.addColorStop(0, 0xffffff);
 
   const style = new TextStyle({
     fontFamily: 'Arial',
@@ -44,21 +50,24 @@ export function useGameOverScreen({app, retryClick}: { app: Application, retryCl
 
   const retryText = new Text({ text: 'Try again?', style: retryStyle });
   const scoreStrTemplate = "You've accumulated %score% days of treasures.";
-  const scoreText = new Text({ text: scoreStrTemplate, style: {...retryText, fontWeight: 'normal', fontSize: 32} });
+  const scoreText = new Text({
+    text: scoreStrTemplate,
+    style: { ...retryText, fontWeight: 'normal', fontSize: 32 },
+  });
 
   background.position.set(0);
   container.addChild(background);
 
   gameOverText.anchor.set(0.5, 0);
-  gameOverText.position.set(app.screen.width/2, 200);
+  gameOverText.position.set(app.screen.width / 2, 200);
   container.addChild(gameOverText);
 
   scoreText.anchor.set(0.5, 0.5);
-  scoreText.position.set(app.screen.width/2, app.screen.height/2);
+  scoreText.position.set(app.screen.width / 2, app.screen.height / 2);
   container.addChild(scoreText);
 
   retryText.anchor.set(0.5, 1);
-  retryText.position.set(app.screen.width/2, app.screen.height - 200);
+  retryText.position.set(app.screen.width / 2, app.screen.height - 200);
   retryText.interactive = true;
   retryText.cursor = 'pointer';
   retryText.on('pointerdown', retryClick);
@@ -86,41 +95,53 @@ export function useGameOverScreen({app, retryClick}: { app: Application, retryCl
   // after a second or two, show "try again ?" button
   function animate(score: number) {
     gsap.fromTo(container, { alpha: 0 }, { alpha: 1, duration: 0.1 });
-    gsap.fromTo(retryText, { y: app.screen.height + retryText.height, alpha: 0.8 },
-      { alpha: 1, y: app.screen.height - 200, duration: 1, delay: 1.5 })
+    gsap
+      .fromTo(
+        retryText,
+        { y: app.screen.height + retryText.height, alpha: 0.8 },
+        { alpha: 1, y: app.screen.height - 200, duration: 1, delay: 1.5 }
+      )
       .then(() => {
-        gsap.fromTo(retryText.scale, {x:1,y:1}, {
-          delay: 10,
-          duration: 1,
-          x: 1.1,
-          y: 1.1,
-          yoyo: true,
-          repeat: -1,
-          ease: "sine.inOut"
-        });
+        gsap.fromTo(
+          retryText.scale,
+          { x: 1, y: 1 },
+          {
+            delay: 10,
+            duration: 1,
+            x: 1.1,
+            y: 1.1,
+            yoyo: true,
+            repeat: -1,
+            ease: 'sine.inOut',
+          }
+        );
       });
     scoreText.visible = false;
-    gsap.fromTo(gameOverText, { y: -gameOverText.height }, {
-      y: 200,
-      delay: .5,
-      duration: .5,
-      ease: "elastic.out(1,0.75)",
-      onComplete: () => {
-        scoreText.visible = true;
-        const obj = {
-          score: 0,
-        };
-        gsap.to(obj, {
-          score,
-          duration: 1 + score * 0.05,
-          roundProps: "score", // Ensures the number is rounded to integers
-          onUpdate: () => {
-            // Update the string with the animated number
-            scoreText.text = scoreStrTemplate.replace("%score%", obj.score.toString());
-          }
-        });
+    gsap.fromTo(
+      gameOverText,
+      { y: -gameOverText.height },
+      {
+        y: 200,
+        delay: 0.5,
+        duration: 0.5,
+        ease: 'elastic.out(1,0.75)',
+        onComplete: () => {
+          scoreText.visible = true;
+          const obj = {
+            score: 0,
+          };
+          gsap.to(obj, {
+            score,
+            duration: 1 + score * 0.05,
+            roundProps: 'score', // Ensures the number is rounded to integers
+            onUpdate: () => {
+              // Update the string with the animated number
+              scoreText.text = scoreStrTemplate.replace('%score%', obj.score.toString());
+            },
+          });
+        },
       }
-    });
+    );
   }
 
   return {
@@ -135,6 +156,6 @@ export function useGameOverScreen({app, retryClick}: { app: Application, retryCl
       _parent.removeChild(container);
       container.visible = false;
       container.interactive = false;
-    }
+    },
   };
 }

@@ -8,18 +8,15 @@ import settings from './settings';
 import { ShockwaveFilter } from 'pixi-filters';
 import gsap from 'gsap';
 
-
-const shockwaveFilter = new ShockwaveFilter(
-  {
-    center: new Point(100, 100),
-    amplitude: 50,   // Strength of the distortion
-    wavelength: 160, // Size of the ripple
-    brightness: 1,   // Brightness of the effect
-    radius: 300,     // Size of the shockwave
-    speed: 600,      // Speed of the ripple animation
-    time: 0.5
-  }
-);
+const shockwaveFilter = new ShockwaveFilter({
+  center: new Point(100, 100),
+  amplitude: 50, // Strength of the distortion
+  wavelength: 160, // Size of the ripple
+  brightness: 1, // Brightness of the effect
+  radius: 300, // Size of the shockwave
+  speed: 600, // Speed of the ripple animation
+  time: 0.5,
+});
 
 enum GameState {
   Playing = 'Playing',
@@ -42,21 +39,20 @@ export function useGameScreen(app: Application) {
    */
   const gameTime = useGameTime(app);
 
-
   function init() {
     const background = Sprite.from(assets.game.background);
 
     // Background
-    background.position.set(app.screen.width/2, app.screen.height/2);
+    background.position.set(app.screen.width / 2, app.screen.height / 2);
     background.anchor.set(0.5);
     // Small hack on background image so that screen shake doesn't show white borders
-    background.scale.set((app.screen.width+SCREEN_SHAKE_FORCE*2) / app.screen.width);
+    background.scale.set((app.screen.width + SCREEN_SHAKE_FORCE * 2) / app.screen.width);
     background.filters = [shockwaveFilter];
     container.addChild(background);
 
     // Life text
     lifeText.anchor.set(0.5);
-    lifeText.position.set(app.screen.width/2, 150);
+    lifeText.position.set(app.screen.width / 2, 150);
     lifeText.style.fill = 'red';
     container.addChild(lifeText);
 
@@ -68,7 +64,7 @@ export function useGameScreen(app: Application) {
     retryClick: () => {
       gameOverScreen.disable();
       gameStart();
-    }
+    },
   });
 
   // todo: Math fc to increase diff, and change the curve to steps. with a max playtime defined ?
@@ -95,20 +91,18 @@ export function useGameScreen(app: Application) {
     // Stop spawning bombs
     app.ticker.remove(bombSpawnTick);
 
-
-
     const BOMB_EXPLO_GAP_MS = 100;
 
     const explosions = bombs
-      .sort((a,b) => b.positionY - a.positionY)
-      .map((bomb, index) => new Promise<void>(resolve => {
-        setTimeout(
-          () => {
-            bomb.explodeNow().then(resolve);
-          },
-          index * BOMB_EXPLO_GAP_MS
-        );
-      }));
+      .sort((a, b) => b.positionY - a.positionY)
+      .map(
+        (bomb, index) =>
+          new Promise<void>(resolve => {
+            setTimeout(() => {
+              bomb.explodeNow().then(resolve);
+            }, index * BOMB_EXPLO_GAP_MS);
+          })
+      );
 
     // Waiting for explosion to finish is a little dramatic touch
     // and also avoid screenshake to misplace the game over screen.
@@ -141,9 +135,18 @@ export function useGameScreen(app: Application) {
         lifeText.text = lives.toString();
         screenShake(container, SCREEN_SHAKE_FORCE, 0.2);
         shockwaveFilter.center = pos;
-        gsap.fromTo(shockwaveFilter, {time: 0}, {time: 1, duration: 1, ease: 'power2.out', onComplete: () => {
-          shockwaveFilter.time = 0;
-        }});
+        gsap.fromTo(
+          shockwaveFilter,
+          { time: 0 },
+          {
+            time: 1,
+            duration: 1,
+            ease: 'power2.out',
+            onComplete: () => {
+              shockwaveFilter.time = 0;
+            },
+          }
+        );
 
         if (lives <= 0 && state === GameState.Playing) {
           preGameOver(explosionAnim);
@@ -159,7 +162,7 @@ export function useGameScreen(app: Application) {
       bombs.push(bomb);
 
       // Small chance of spawning a bomb with a different fall angle
-      const ALSO_SPAWN_DIAGONAL = .25;
+      const ALSO_SPAWN_DIAGONAL = 0.25;
       if (Math.random() < ALSO_SPAWN_DIAGONAL) {
         const bomb = spawnBomb({
           app,
@@ -171,7 +174,6 @@ export function useGameScreen(app: Application) {
       }
     }
   }
-
 
   function gameStart() {
     if (state !== GameState.GameOver) {
@@ -209,6 +211,6 @@ export function useGameScreen(app: Application) {
       }
 
       gameStart();
-    }
-  }
+    },
+  };
 }

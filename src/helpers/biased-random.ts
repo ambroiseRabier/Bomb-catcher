@@ -6,12 +6,18 @@
  * @param avoidRange Range within which we want to reduce probability. For example, if `avoidRange` is 20 and `previous = 50`, numbers between `30–70` will have a reduced likelihood.
  * @param avoidProbability The likelihood of rejecting numbers within the `avoidRange`. Probability of avoiding close values (e.g., 20%) (Between 0 and 1)
  */
-export function biasedRandom({min, max, previous, avoidRange, avoidProbability}: {
-  min: number,
-  max: number,
-  previous: number,
-  avoidRange: number,
-  avoidProbability: number
+export function biasedRandom({
+  min,
+  max,
+  previous,
+  avoidRange,
+  avoidProbability,
+}: {
+  min: number;
+  max: number;
+  previous: number;
+  avoidRange: number;
+  avoidProbability: number;
 }): number {
   const range = max - min;
 

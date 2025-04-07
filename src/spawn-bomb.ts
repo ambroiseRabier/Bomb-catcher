@@ -4,7 +4,6 @@ import { assets } from './assets';
 import { biasedRandom } from './helpers/biased-random';
 import gsap from 'gsap';
 
-
 interface Props {
   app: Application;
   onExplode: (explosionAnim: Promise<void>, position: Point) => void;
@@ -24,7 +23,7 @@ enum BombState {
 
 export type Bomb = ReturnType<typeof spawnBomb>;
 
-export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
+export function spawnBomb({ app, onExplode, diagonal, fallTimeSec }: Props) {
   // Safeguard against wrong formulas.
   if (fallTimeSec <= 0) {
     throw new Error('fallTime must be > 0');
@@ -40,7 +39,6 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
   const TOUCH_HITBOX_2 = new Circle(0, -24, 48);
   const TOUCH_HITBOX_3 = new Circle(0, 24, 48);
   const explodeHitBox = new Circle(0, 0, 38);
-
 
   // todo: likely need to move that elsewhere
   // Add screen height to the rectangle to avoid missing collision on fast moving objects.
@@ -59,10 +57,12 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
       contains(x: number, y: number): boolean {
         // In addition to that, we add a hitbox slightly above and bellow to help catch fast moving object.
         // (ovoid)
-        return TOUCH_HITBOX.contains(x, y)
-          || TOUCH_HITBOX_2.contains(x, y)
-          || TOUCH_HITBOX_3.contains(x, y);
-      }
+        return (
+          TOUCH_HITBOX.contains(x, y) ||
+          TOUCH_HITBOX_2.contains(x, y) ||
+          TOUCH_HITBOX_3.contains(x, y)
+        );
+      },
     };
     container.cursor = 'pointer';
     container.on('pointerdown', catchedState);
@@ -70,7 +70,7 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
     // Bomb sprite anchor needs to be on the center of the bomb, not the bomb fuse.
     // This allows proper rotation to be visible
     // Sprite is 85*145, bomb radius is 42
-    sprite.anchor.set(0.5, 1 - (42/145));
+    sprite.anchor.set(0.5, 1 - 42 / 145);
     container.addChild(sprite);
 
     exploSprite.anchor.set(0.5);
@@ -98,7 +98,7 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
 
     // Animate
     await Promise.race([
-      gsap.to(container.scale, {x: 0.1, y: 0.1, duration: 1, ease: 'circ.out', yoyo: true}),
+      gsap.to(container.scale, { x: 0.1, y: 0.1, duration: 1, ease: 'circ.out', yoyo: true }),
       gsap.to(container, {
         angle: (Math.random() * 500 + 400) * (Math.random() > 0.5 ? 1 : -1),
         duration: 1.33, // don't want it to stop spinning before it disappear
@@ -110,7 +110,9 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
         ease: 'back.out(4)',
       }),
       gsap.to(container, {
-        x: container.position.x + (40 * Math.random() + 20) * (container.position.x > app.screen.width / 2 ? 1 : -1),
+        x:
+          container.position.x +
+          (40 * Math.random() + 20) * (container.position.x > app.screen.width / 2 ? 1 : -1),
         duration: 1,
         ease: 'power1.out',
       }),
@@ -132,7 +134,7 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
       // Approximate total fall height to screen.height.
       // Note: fall time is for a straight vertical line, diagonal bombs will take more time.
       // Note: This has the downside of making the game harder on big screens.
-      const speed = (app.screen.height / fallTimeSec) * (app.ticker.deltaMS/1000);
+      const speed = (app.screen.height / fallTimeSec) * (app.ticker.deltaMS / 1000);
       container.position.y += fallVector.y * speed;
       container.position.x += fallVector.x * speed;
 
@@ -141,7 +143,7 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
       const left = container.position.x - TOUCH_HITBOX.radius < 0;
       if (right || left) {
         fallVector.x *= -1;
-        gsap.to(container.scale, {x: -container.scale.x, duration: 0.15, ease: 'power2.inOut'})
+        gsap.to(container.scale, { x: -container.scale.x, duration: 0.15, ease: 'power2.inOut' });
       }
     } else {
       // Remove one live
@@ -190,9 +192,10 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
       avoidProbability: 0.75,
     });
     previousXRandom = rand;
-    container.position.x = HORIZONTAL_SPAWN_MARGIN_PX + rand * (app.screen.width - HORIZONTAL_SPAWN_MARGIN_PX*2 - sprite.width);
+    container.position.x =
+      HORIZONTAL_SPAWN_MARGIN_PX +
+      rand * (app.screen.width - HORIZONTAL_SPAWN_MARGIN_PX * 2 - sprite.width);
     sprite.angle = (Math.random() * 2 - 1) * 15; // visual variation
-
 
     // Move in diagonal
     // Funner if it appears in addition and not in replacement of another bomb.
@@ -203,12 +206,11 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
       const angleMax = 60;
 
       // It looks better when angle sign varies at (almost) each bomb
-      const SAME_SIGN_PROBABILITY = 0.20;
-      const sign = Math.random() < SAME_SIGN_PROBABILITY ? previousFirstAngleSign : -previousFirstAngleSign;
-      const fallAngle = sign * (
-        angleMin + Math.random() * (angleMax - angleMin)
-      ) + 90; // 90 because 0 deg angle is pointing right side
-      fallVector = new Point(Math.cos(fallAngle*degToRad), Math.sin(fallAngle*degToRad));
+      const SAME_SIGN_PROBABILITY = 0.2;
+      const sign =
+        Math.random() < SAME_SIGN_PROBABILITY ? previousFirstAngleSign : -previousFirstAngleSign;
+      const fallAngle = sign * (angleMin + Math.random() * (angleMax - angleMin)) + 90; // 90 because 0 deg angle is pointing right side
+      fallVector = new Point(Math.cos(fallAngle * degToRad), Math.sin(fallAngle * degToRad));
       sprite.angle = fallAngle - 90;
     }
 
@@ -223,7 +225,6 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
     // Should already be stopped, but just in case.
     app.ticker.remove(update);
   }
-
 
   // random start position, angle
   // difficulty increase (as param of useBomb?)
@@ -243,6 +244,6 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
         return explodeState();
       }
       return Promise.resolve();
-    }
-  }
+    },
+  };
 }

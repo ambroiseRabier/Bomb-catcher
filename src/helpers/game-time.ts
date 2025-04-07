@@ -1,13 +1,11 @@
 import { Application } from 'pixi.js';
 
-
 export function useGameTime(app: Application) {
   // Track total elapsed time (in seconds)
   let elapsedTime = 0;
   let isPaused = false;
   // Time when the last frame was updated
   let lastFrameTime: number;
-
 
   function start() {
     elapsedTime = 0;
@@ -66,6 +64,5 @@ export function useGameTime(app: Application) {
     start,
     end,
     pause,
-  }
-
+  };
 }

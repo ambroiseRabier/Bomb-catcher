@@ -1,5 +1,3 @@
-
-
 export const assets = {
   titlescreen: {
     background: '/placeholders/titlescreen/Background.PNG',
@@ -10,5 +8,5 @@ export const assets = {
     background: '/placeholders/game/Background.PNG',
     bomb: '/placeholders/game/Bomb.PNG',
     explosion: '/placeholders/game/Explosion.PNG',
-  }
-}
+  },
+};

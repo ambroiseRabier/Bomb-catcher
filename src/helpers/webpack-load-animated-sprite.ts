@@ -1,6 +1,5 @@
 import { AnimatedSprite, Assets, Spritesheet } from 'pixi.js';
 
-
 /**
  *
  * @param png

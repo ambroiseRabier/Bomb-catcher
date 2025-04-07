@@ -6,13 +6,12 @@ import { setBasicOptions } from './helpers/set-basic-options';
 import { useTitleScreen } from './title.screen';
 import { useGameScreen } from './game.screen';
 
-
 const app = new Application();
 await app.init({
   // You should also update tauri.conf.json is you change width or height.
   width: 720,
   height: 1280,
-  backgroundColor: 0xEEEEEE
+  backgroundColor: 0xeeeeee,
 });
 
 // If we have less space, downscale, if we have more, don't upscale.
@@ -31,7 +30,7 @@ const titleScreen = useTitleScreen({
     await gameScreenLoad;
     titleScreen.disable();
     gameScreen.enable();
-  }
+  },
 });
 
 // Load fast, if not, we need to add a loading screen.

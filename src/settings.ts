@@ -45,8 +45,8 @@ const prodSettings = {
 
       // Same as falltime
       return compute(t, 1.6, 130, INITIAL_FALL_TIME_SEC, 40);
-    }
-  }
+    },
+  },
 };
 
 // Settings to be used to quickly test something
@@ -54,10 +54,8 @@ const devSettings = {
   lives: prodSettings.lives,
   bomb: {
     fallTimeSec: prodSettings.bomb.fallTimeSec,
-    bombPerMin: prodSettings.bomb.bombPerMin
-  }
+    bombPerMin: prodSettings.bomb.bombPerMin,
+  },
 };
-
-
 
 export default devSettings;

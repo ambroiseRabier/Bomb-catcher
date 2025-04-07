@@ -28,7 +28,7 @@ export function spawnBomb({ app, onExplode, diagonal, fallTimeSec }: Props) {
   if (fallTimeSec <= 0) {
     throw new Error('fallTime must be > 0');
   }
-  console.log('fallTimeSec ' + fallTimeSec);
+  // console.debug('fallTimeSec ' + fallTimeSec);
 
   // Note: PIXI internally cache the sprite, that means no overhead in calling this multiple times :)
   const sprite = Sprite.from(assets.game.bomb);
@@ -79,7 +79,6 @@ export function spawnBomb({ app, onExplode, diagonal, fallTimeSec }: Props) {
     app.stage.addChild(container);
 
     enable();
-    // disable(); // todo pooling.
   }
 
   async function catchedState() {
@@ -123,6 +122,8 @@ export function spawnBomb({ app, onExplode, diagonal, fallTimeSec }: Props) {
     // todo: each state, in and out (, param fromState ?)
   }
 
+  let alarmUsed = false;
+
   function update() {
     // update hitbox position.
     explodeHitBox.x = container.position.x;
@@ -150,6 +151,14 @@ export function spawnBomb({ app, onExplode, diagonal, fallTimeSec }: Props) {
       const explosionAnim = explodeState(); // todo state handling, each his coroutine ?
       // Call right after state has been changed to Exploding or explodeState will be called twice for this bomb.
       onExplode(explosionAnim, container.position);
+    }
+
+    if (container.position.y > app.screen.height * 0.66 && !alarmUsed) {
+      alarmUsed = true;
+      // alarm/siren style.
+      gsap.fromTo(container, { tint: 0xffffff},
+        { tint: 0xff0000, yoyo: true, repeat:3, duration: 0.33, ease: 'sine.inOut' }
+      );
     }
   }
 
@@ -183,7 +192,7 @@ export function spawnBomb({ app, onExplode, diagonal, fallTimeSec }: Props) {
 
     // Initial position
     container.position.y = -sprite.height * 1.1;
-    const HORIZONTAL_SPAWN_MARGIN_PX = 50;
+    const HORIZONTAL_SPAWN_MARGIN_PX = 25;
     const rand = biasedRandom({
       min: 0,
       max: 1,
@@ -192,10 +201,11 @@ export function spawnBomb({ app, onExplode, diagonal, fallTimeSec }: Props) {
       avoidProbability: 0.75,
     });
     previousXRandom = rand;
+    const margin = HORIZONTAL_SPAWN_MARGIN_PX + TOUCH_HITBOX.radius;
     container.position.x =
-      HORIZONTAL_SPAWN_MARGIN_PX +
-      rand * (app.screen.width - HORIZONTAL_SPAWN_MARGIN_PX * 2 - sprite.width);
-    sprite.angle = (Math.random() * 2 - 1) * 15; // visual variation
+      margin +
+      rand * (app.screen.width - margin * 2);
+    sprite.angle = (Math.random() * 2 - 1) * 10; // visual variation
 
     // Move in diagonal
     // Funner if it appears in addition and not in replacement of another bomb.

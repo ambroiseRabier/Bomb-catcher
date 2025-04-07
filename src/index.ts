@@ -12,6 +12,7 @@ await app.init({
   width: 720,
   height: 1280,
   backgroundColor: 0xeeeeee,
+  antialias: true
 });
 
 // If we have less space, downscale, if we have more, don't upscale.

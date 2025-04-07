@@ -10,9 +10,14 @@ export function useGameOverScreen({
 }) {
   const container = new Container();
   const background = new Graphics();
-  background.beginFill(0x000000, 0.5);
-  background.drawRect(0, 0, app.screen.width, app.screen.height);
-  background.endFill();
+  background
+    .rect(0, 0, app.screen.width, app.screen.height)
+    .fill({
+      color: 0x000000,
+      alpha: 0.5,
+    });
+
+
   const fill = new FillGradient(0, 0, 0, 10);
   fill.addColorStop(0, 0x000000);
   fill.addColorStop(0, 0xffffff);

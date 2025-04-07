@@ -7,6 +7,7 @@ import { useGameTime } from './helpers/game-time';
 import settings from './settings';
 import { ShockwaveFilter } from 'pixi-filters';
 import gsap from 'gsap';
+import { useRainbow } from './rainbow';
 
 const shockwaveFilter = new ShockwaveFilter({
   center: new Point(100, 100),
@@ -15,7 +16,7 @@ const shockwaveFilter = new ShockwaveFilter({
   brightness: 1, // Brightness of the effect
   radius: 300, // Size of the shockwave
   speed: 600, // Speed of the ripple animation
-  time: 0.5,
+  time: 0,
 });
 
 enum GameState {
@@ -38,6 +39,7 @@ export function useGameScreen(app: Application) {
    * In ms.
    */
   const gameTime = useGameTime(app);
+  const rainbow = useRainbow();
 
   function init() {
     const background = Sprite.from(assets.game.background);
@@ -49,6 +51,10 @@ export function useGameScreen(app: Application) {
     background.scale.set((app.screen.width + SCREEN_SHAKE_FORCE * 2) / app.screen.width);
     background.filters = [shockwaveFilter];
     container.addChild(background);
+
+    // Rainbow
+    rainbow.container.position.set(app.screen.width / 2, app.screen.height + 5); // 5 offset
+    container.addChild(rainbow.container);
 
     // Life text
     lifeText.anchor.set(0.5);
@@ -132,9 +138,14 @@ export function useGameScreen(app: Application) {
 
       function onExplode(explosionAnim: Promise<void>, pos: Point) {
         lives--;
+        // max 7 bows to remove.
+        if (settings.lives - lives <= 7) {
+          rainbow.loseBow();
+        }
         lifeText.text = lives.toString();
         screenShake(container, SCREEN_SHAKE_FORCE, 0.2);
         shockwaveFilter.center = pos;
+        shockwaveFilter.enabled = true;
         gsap.fromTo(
           shockwaveFilter,
           { time: 0 },
@@ -144,6 +155,7 @@ export function useGameScreen(app: Application) {
             ease: 'power2.out',
             onComplete: () => {
               shockwaveFilter.time = 0;
+              shockwaveFilter.enabled = false;
             },
           }
         );
@@ -184,6 +196,7 @@ export function useGameScreen(app: Application) {
     gameTime.start();
 
     lives = settings.lives;
+    rainbow.reset();
     lifeText.text = lives.toString();
     app.ticker.add(bombSpawnTick);
   }

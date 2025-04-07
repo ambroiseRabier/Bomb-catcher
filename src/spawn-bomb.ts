@@ -7,6 +7,7 @@ import gsap from 'gsap';
 interface Props {
   app: Application;
   onExplode: (explosionAnim: Promise<void>, position: Point) => void;
+  onCatch: () => void;
   diagonal: boolean;
   fallTimeSec: number;
 }
@@ -23,12 +24,11 @@ enum BombState {
 
 export type Bomb = ReturnType<typeof spawnBomb>;
 
-export function spawnBomb({ app, onExplode, diagonal, fallTimeSec }: Props) {
+export function spawnBomb({ app, onExplode, onCatch, diagonal, fallTimeSec }: Props) {
   // Safeguard against wrong formulas.
   if (fallTimeSec <= 0) {
     throw new Error('fallTime must be > 0');
   }
-  // console.debug('fallTimeSec ' + fallTimeSec);
 
   // Note: PIXI internally cache the sprite, that means no overhead in calling this multiple times :)
   const sprite = Sprite.from(assets.game.bomb);
@@ -88,12 +88,10 @@ export function spawnBomb({ app, onExplode, diagonal, fallTimeSec }: Props) {
     }
     state = BombState.Catched;
 
-    // todo
-    // move out of screen with a bounce, while scaling down a bit (ease fc type log)
-    // and a strong rotation
-
     app.ticker.remove(update);
     container.interactive = false;
+
+    onCatch();
 
     // Animate
     await Promise.race([
@@ -209,6 +207,8 @@ export function spawnBomb({ app, onExplode, diagonal, fallTimeSec }: Props) {
 
     // Move in diagonal
     // Funner if it appears in addition and not in replacement of another bomb.
+    // KNOWN ISSUE: haven't found out why yet, but rarely, a bomb has the wrong scale.x, which make it hard to click and see.
+    //              It could be part of the game design, but it is a bit punitive.
     if (diagonal) {
       const degToRad = Math.PI / 180;
       const angleMin = 30;

@@ -1,6 +1,6 @@
 {"frames": {
 
-"frame0000.png":
+"chest0000.png":
 {
 	"frame": {"x":196,"y":1,"w":168,"h":152},
 	"rotated": true,
@@ -8,7 +8,7 @@
 	"spriteSourceSize": {"x":34,"y":59,"w":168,"h":152},
 	"sourceSize": {"w":219,"h":211}
 },
-"frame0001.png":
+"chest0001.png":
 {
 	"frame": {"x":350,"y":1,"w":151,"h":136},
 	"rotated": true,
@@ -16,7 +16,7 @@
 	"spriteSourceSize": {"x":41,"y":73,"w":151,"h":136},
 	"sourceSize": {"w":219,"h":211}
 },
-"frame0002.png":
+"chest0002.png":
 {
 	"frame": {"x":1,"y":1,"w":193,"h":169},
 	"rotated": false,
@@ -25,7 +25,7 @@
 	"sourceSize": {"w":219,"h":211}
 }},
 "animations": {
-	"frame": ["frame0000.png","frame0001.png","frame0002.png"]
+	"frame": ["chest0000.png","chest0001.png","chest0002.png"]
 },
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",

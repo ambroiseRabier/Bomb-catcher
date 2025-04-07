@@ -1,0 +1,87 @@
+{"frames": {
+
+"frame0000.png":
+{
+	"frame": {"x":1,"y":1,"w":368,"h":237},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":368,"h":237},
+	"sourceSize": {"w":368,"h":237}
+},
+"frame0001.png":
+{
+	"frame": {"x":371,"y":1,"w":368,"h":237},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":368,"h":237},
+	"sourceSize": {"w":368,"h":237}
+},
+"frame0002.png":
+{
+	"frame": {"x":741,"y":1,"w":368,"h":237},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":368,"h":237},
+	"sourceSize": {"w":368,"h":237}
+},
+"frame0003.png":
+{
+	"frame": {"x":1111,"y":1,"w":368,"h":237},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":368,"h":237},
+	"sourceSize": {"w":368,"h":237}
+},
+"frame0004.png":
+{
+	"frame": {"x":1481,"y":1,"w":368,"h":237},
+	"rotated": true,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":368,"h":237},
+	"sourceSize": {"w":368,"h":237}
+},
+"frame0005.png":
+{
+	"frame": {"x":1,"y":240,"w":368,"h":237},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":368,"h":237},
+	"sourceSize": {"w":368,"h":237}
+},
+"frame0006.png":
+{
+	"frame": {"x":371,"y":240,"w":368,"h":237},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":368,"h":237},
+	"sourceSize": {"w":368,"h":237}
+},
+"frame0007.png":
+{
+	"frame": {"x":741,"y":240,"w":368,"h":237},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":368,"h":237},
+	"sourceSize": {"w":368,"h":237}
+},
+"frame0008.png":
+{
+	"frame": {"x":1111,"y":240,"w":368,"h":237},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":368,"h":237},
+	"sourceSize": {"w":368,"h":237}
+}},
+"animations": {
+	"frame": ["frame0000.png","frame0001.png","frame0002.png","frame0003.png","frame0004.png","frame0005.png","frame0006.png","frame0007.png","frame0008.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "plane.sp.png",
+	"format": "RGBA8888",
+	"size": {"w":1719,"h":478},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:73c1dc6a344fd88371351c2bda9e72e5:2a8c6d53c688d633c843a745cf3acc6a:e1c71555315e5d1d077e1305cb53a3ca$"
+}
+}

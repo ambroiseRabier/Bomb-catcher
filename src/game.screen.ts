@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Sprite, Ticker, Text, Point, Spritesheet, AnimatedSprite } from 'pixi.js';
+import { Application, Assets, Container, Point, Sprite, Text, Ticker } from 'pixi.js';
 import { Bomb, spawnBomb } from './spawn-bomb';
 import { assets } from './assets';
 import { useGameOverScreen } from './game-over.screen';
@@ -9,6 +9,7 @@ import { ShockwaveFilter } from 'pixi-filters';
 import gsap from 'gsap';
 import { useRainbow } from './rainbow';
 import { useChest } from './chest';
+import { usePlane } from './plane';
 
 const shockwaveFilter = new ShockwaveFilter({
   center: new Point(100, 100),
@@ -31,7 +32,6 @@ export function useGameScreen(app: Application) {
   let inited = false;
   const SCREEN_SHAKE_FORCE = 50; // 25 max on y or x
   const container = new Container();
-  const lifeText = new Text(settings.lives.toString());
   let lives: number;
   const bombs: Bomb[] = [];
   let state = GameState.GameOver;
@@ -42,6 +42,15 @@ export function useGameScreen(app: Application) {
   const gameTime = useGameTime(app);
   const rainbow = useRainbow();
   let chest: ReturnType<typeof useChest>;
+  /**
+   * Plane that appears when the speed of bombs goes up. (feedback on time and difficulty)
+   * PS: As a player I really want to be able to click the plane, but that's another feature.
+   */
+  let planeSpeedIncrease: ReturnType<typeof usePlane>;
+  /**
+   * Same as planeSpeedIncrease but for quantity
+   */
+  let planeQuantityIncrease: ReturnType<typeof usePlane>;
 
   function init() {
     const background = Sprite.from(assets.game.background);
@@ -65,11 +74,15 @@ export function useGameScreen(app: Application) {
     chest.container.position.set(app.screen.width / 2-5, app.screen.height - 75);
     container.addChild(chest.container);
 
-    // Life text
-    lifeText.anchor.set(0.5);
-    lifeText.position.set(app.screen.width / 2, 150);
-    lifeText.style.fill = 'red';
-    container.addChild(lifeText);
+    // Planes
+    planeSpeedIncrease = usePlane();
+    planeSpeedIncrease.container.position.y = planeSpeedIncrease.container.height/2 + 20;
+    planeSpeedIncrease.container.visible = false;
+    container.addChild(planeSpeedIncrease.container);
+    planeQuantityIncrease = usePlane();
+    planeQuantityIncrease.container.position.y = planeQuantityIncrease.container.height/2 + 40;
+    planeQuantityIncrease.container.visible = false;
+    container.addChild(planeQuantityIncrease.container);
 
     app.stage.addChild(container);
   }
@@ -128,6 +141,8 @@ export function useGameScreen(app: Application) {
   }
 
   let elapsedTime = 0;
+  let previousBombPerMin = settings.bomb.bombPerMin(0); // already ceiled in formula
+  let previousFallTime = settings.bomb.fallTimeSec(0); // already ceiled in formula
   function bombSpawnTick(ticker: Ticker) {
     if (lives <= 0) {
       throw new Error('Unexpected spawning of bomb when lives <= 0');
@@ -142,10 +157,17 @@ export function useGameScreen(app: Application) {
     const bombPerMs = 1000 / (settings.bomb.bombPerMin(gameTime.elapsedTime) / 60);
 
     if (elapsedTime >= bombPerMs) {
-      // console.debug('bombPerMs ' + bombPerMs);
+      if (previousBombPerMin !== settings.bomb.bombPerMin(gameTime.elapsedTime)) {
+        previousBombPerMin = settings.bomb.bombPerMin(gameTime.elapsedTime);
+        planeQuantityIncrease.leftToRight(app);
+        // console.debug('bombPerMs ' + bombPerMs);
+      }
+
       elapsedTime -= bombPerMs;
 
       function onExplode(explosionAnim: Promise<void>, pos: Point) {
+        // Remove the bomb, so that we won't wait for it at pre-gameover anim.
+        bombs.splice(bombs.indexOf(bomb), 1);
         lives--;
         // max 7 bows to remove.
         if (lives <= 8 && lives >= 2) {
@@ -154,7 +176,6 @@ export function useGameScreen(app: Application) {
         if (lives < 2 && lives >= 0) {
           chest.loseLive();
         }
-        lifeText.text = lives.toString();
         screenShake(container, SCREEN_SHAKE_FORCE, 0.2);
         shockwaveFilter.center = pos;
         shockwaveFilter.enabled = true;
@@ -177,11 +198,21 @@ export function useGameScreen(app: Application) {
         }
       }
 
+      const fallTime = settings.bomb.fallTimeSec(gameTime.elapsedTime);
+      if (previousFallTime !== fallTime) {
+        previousFallTime = fallTime;
+        // Different plane, in rare case where both speed and quantity get increased at once.
+        // Gd tries to avoid both at the same time.
+        planeSpeedIncrease.rightToLeft(app);
+        // console.debug('fallTime ' + fallTime);
+      }
+
       const bomb = spawnBomb({
         app,
         onExplode,
+        onCatch: () => bombs.splice(bombs.indexOf(bomb), 1),
         diagonal: false,
-        fallTimeSec: settings.bomb.fallTimeSec(gameTime.elapsedTime),
+        fallTimeSec: fallTime,
       });
       bombs.push(bomb);
 
@@ -191,8 +222,9 @@ export function useGameScreen(app: Application) {
         const bomb = spawnBomb({
           app,
           onExplode,
+          onCatch: () => bombs.splice(bombs.indexOf(bomb), 1),
           diagonal: true,
-          fallTimeSec: settings.bomb.fallTimeSec(gameTime.elapsedTime),
+          fallTimeSec: fallTime,
         });
         bombs.push(bomb);
       }
@@ -210,7 +242,6 @@ export function useGameScreen(app: Application) {
     lives = settings.lives;
     rainbow.reset();
     chest.reset();
-    lifeText.text = lives.toString();
     app.ticker.add(bombSpawnTick);
   }
 

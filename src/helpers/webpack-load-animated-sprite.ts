@@ -39,13 +39,14 @@ import { AnimatedSprite, Assets, Spritesheet } from 'pixi.js';
  *
  * ```
  */
-export async function loadAnimatedSprite(png: string, json: any): Promise<AnimatedSprite> {
+export async function loadAnimatedSprite(png: string, json: unknown): Promise<AnimatedSprite> {
   try {
     // Load the image (BaseTexture) using Assets.load
     const baseTexture = await Assets.load(png);
 
     // Create the spritesheet using the loaded BaseTexture and JSON data
-    const spritesheet = new Spritesheet(baseTexture, json);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const spritesheet = new Spritesheet(baseTexture, json as any);
 
     // Parse the spritesheet to generate textures
     await spritesheet.parse();

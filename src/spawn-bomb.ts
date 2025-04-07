@@ -12,7 +12,7 @@ interface Props {
 }
 
 let previousXRandom = Math.random();
-let previousFirstAngleSign = Math.random() > 0 ? 1 : -1;
+const previousFirstAngleSign = Math.random() > 0 ? 1 : -1;
 
 enum BombState {
   Idle = 'Idle',
@@ -201,7 +201,6 @@ export function spawnBomb({ app, onExplode, diagonal, fallTimeSec }: Props) {
     // Funner if it appears in addition and not in replacement of another bomb.
     if (diagonal) {
       const degToRad = Math.PI / 180;
-      const radToDeg = 180 / Math.PI;
       const angleMin = 30;
       const angleMax = 60;
 

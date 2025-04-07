@@ -44,5 +44,7 @@ gameScreenLoad = gameScreen.load();
 const TAURI = false;
 
 if (TAURI) {
+  // This is old and may be refactored into await import.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('./init-tauri');
 }

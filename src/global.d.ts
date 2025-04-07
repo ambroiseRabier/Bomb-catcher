@@ -11,7 +11,7 @@ declare module '*.png' {
 }
 
 declare module '*.json' {
-  const value: any;
+  const value: unknown;
   export default value;
 }
 // you can add more when needed

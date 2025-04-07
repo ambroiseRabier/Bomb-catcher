@@ -1,14 +1,27 @@
-import { Application, Assets, Container, Sprite, Ticker, Text } from 'pixi.js';
+import { Application, Assets, Container, Sprite, Ticker, Text, Point } from 'pixi.js';
 import { Bomb, spawnBomb } from './spawn-bomb';
 import { assets } from './assets';
 import { useGameOverScreen } from './game-over.screen';
 import { screenShake } from './screenshake';
 import { useGameTime } from './game-time';
 import settings from './settings';
+import { ShockwaveFilter } from 'pixi-filters';
+import gsap from 'gsap';
 
 // todo: move that into a config file.
 const TOTAL_LIVES = 9;
 
+const shockwaveFilter = new ShockwaveFilter(
+  {
+    center: new Point(100, 100),
+    amplitude: 50,   // Strength of the distortion
+    wavelength: 160, // Size of the ripple
+    brightness: 1,   // Brightness of the effect
+    radius: 300,     // Size of the shockwave
+    speed: 600,      // Speed of the ripple animation
+    time: 0.5
+  }
+);
 
 enum GameState {
   Playing = 'Playing',
@@ -40,6 +53,7 @@ export function useGameScreen(app: Application) {
     background.anchor.set(0.5);
     // Small hack on background image so that screen shake doesn't show white borders
     background.scale.set((app.screen.width+SCREEN_SHAKE_FORCE*2) / app.screen.width);
+    background.filters = [shockwaveFilter];
     container.addChild(background);
 
     // Life text
@@ -124,10 +138,15 @@ export function useGameScreen(app: Application) {
       // console.debug('bombPerMs ' + bombPerMs);
       elapsedTime -= bombPerMs;
 
-      function onExplode(explosionAnim: Promise<void>) {
+      function onExplode(explosionAnim: Promise<void>, pos: Point) {
         lives--;
         lifeText.text = lives.toString();
         screenShake(container, SCREEN_SHAKE_FORCE, 0.2);
+        shockwaveFilter.center = pos;
+        gsap.fromTo(shockwaveFilter, {time: 0}, {time: 1, duration: 1, ease: 'power2.out', onComplete: () => {
+          shockwaveFilter.time = 0;
+        }});
+
         if (lives <= 0 && state === GameState.Playing) {
           preGameOver(explosionAnim);
         }

@@ -1,4 +1,4 @@
-import { Application, Circle, Container, Point, Rectangle, Sprite, Ticker } from 'pixi.js';
+import { Application, Circle, Container, Point, Rectangle, Sprite } from 'pixi.js';
 import { circRect } from './helpers/collisions';
 import { assets } from './assets';
 import { biasedRandom } from './biased-random';
@@ -7,7 +7,7 @@ import gsap from 'gsap';
 
 interface Props {
   app: Application;
-  onExplode: (explosionAnim: Promise<void>) => void;
+  onExplode: (explosionAnim: Promise<void>, position: Point) => void;
   diagonal: boolean;
   fallTimeSec: number;
 }
@@ -147,7 +147,7 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
       // Remove one live
       const explosionAnim = explodeState(); // todo state handling, each his coroutine ?
       // Call right after state has been changed to Exploding or explodeState will be called twice for this bomb.
-      onExplode(explosionAnim);
+      onExplode(explosionAnim, container.position);
     }
   }
 

@@ -14,6 +14,7 @@ function h(x: number, a: number, c: number, k: number) {
  * Target is a confirmed gamer (FDJ game dev), with short gameplay 1min-2min per run.
  */
 const prodSettings = {
+  lives: 9,
   bomb: {
     // Fall time based on screen height (1280) (easier to reason with than pixels per second speed)
     fallTimeSec: (t: number): number => {
@@ -50,6 +51,7 @@ const prodSettings = {
 
 // Settings to be used to quickly test something
 const devSettings = {
+  lives: prodSettings.lives,
   bomb: {
     fallTimeSec: prodSettings.bomb.fallTimeSec,
     bombPerMin: prodSettings.bomb.bombPerMin

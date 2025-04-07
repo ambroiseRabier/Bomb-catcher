@@ -1,7 +1,7 @@
 import { Application, Circle, Container, Point, Rectangle, Sprite } from 'pixi.js';
 import { circRect } from './helpers/collisions';
 import { assets } from './assets';
-import { biasedRandom } from './biased-random';
+import { biasedRandom } from './helpers/biased-random';
 import gsap from 'gsap';
 
 

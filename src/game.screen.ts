@@ -2,14 +2,12 @@ import { Application, Assets, Container, Sprite, Ticker, Text, Point } from 'pix
 import { Bomb, spawnBomb } from './spawn-bomb';
 import { assets } from './assets';
 import { useGameOverScreen } from './game-over.screen';
-import { screenShake } from './screenshake';
-import { useGameTime } from './game-time';
+import { screenShake } from './helpers/screenshake';
+import { useGameTime } from './helpers/game-time';
 import settings from './settings';
 import { ShockwaveFilter } from 'pixi-filters';
 import gsap from 'gsap';
 
-// todo: move that into a config file.
-const TOTAL_LIVES = 9;
 
 const shockwaveFilter = new ShockwaveFilter(
   {
@@ -34,7 +32,7 @@ export function useGameScreen(app: Application) {
   let inited = false;
   const SCREEN_SHAKE_FORCE = 50; // 25 max on y or x
   const container = new Container();
-  const lifeText = new Text(TOTAL_LIVES.toString());
+  const lifeText = new Text(settings.lives.toString());
   let lives: number;
   const bombs: Bomb[] = [];
   let state = GameState.GameOver;
@@ -183,7 +181,7 @@ export function useGameScreen(app: Application) {
 
     gameTime.start();
 
-    lives = TOTAL_LIVES;
+    lives = settings.lives;
     lifeText.text = lives.toString();
     app.ticker.add(bombSpawnTick);
   }

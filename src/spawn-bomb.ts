@@ -37,6 +37,8 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
   const container = new Container();
   // Bomb sprite is 42px radius.
   const TOUCH_HITBOX = new Circle(0, 0, 48);
+  const TOUCH_HITBOX_2 = new Circle(0, -24, 48);
+  const TOUCH_HITBOX_3 = new Circle(0, 24, 48);
   const explodeHitBox = new Circle(0, 0, 38);
 
 
@@ -53,7 +55,15 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
   function init() {
     // Instead of rectangle bounding box clickable zone, we use a circle, that should be
     // slightly bigger than the sprite.
-    container.hitArea = TOUCH_HITBOX;
+    container.hitArea = {
+      contains(x: number, y: number): boolean {
+        // In addition to that, we add a hitbox slightly above and bellow to help catch fast moving object.
+        // (ovoid)
+        return TOUCH_HITBOX.contains(x, y)
+          || TOUCH_HITBOX_2.contains(x, y)
+          || TOUCH_HITBOX_3.contains(x, y);
+      }
+    };
     container.cursor = 'pointer';
     container.on('pointerdown', catchedState);
 
@@ -105,7 +115,6 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
         ease: 'power1.out',
       }),
     ]);
-
 
     disable();
 
@@ -223,6 +232,9 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
   // sound?
 
   return {
+    get positionY() {
+      return container.position.y;
+    },
     /**
      * Explode if currently falling, safe to call.
      */

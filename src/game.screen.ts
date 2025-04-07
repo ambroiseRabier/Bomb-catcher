@@ -13,13 +13,13 @@ const TOTAL_LIVES = 9;
 enum GameState {
   Playing = 'Playing',
   GameOver = 'GameOver',
+  PreGameOver = 'PreGameOver',
 }
 
 export function useGameScreen(app: Application) {
   let loaded = false;
   let inited = false;
   const SCREEN_SHAKE_FORCE = 50; // 25 max on y or x
-  const BOMB_SPAWN_INTERVAL_MS = 1000;
   const container = new Container();
   const lifeText = new Text(TOTAL_LIVES.toString());
   let lives: number;
@@ -63,22 +63,47 @@ export function useGameScreen(app: Application) {
 
   async function gameOver() {
     // Catch errors early.
-    if (state !== GameState.Playing) {
+    if (state !== GameState.PreGameOver) {
       throw new Error(`Game over called with wrong state ${state}`);
     }
     state = GameState.GameOver;
+
+    // Retry?
+    gameOverScreen.enable(container);
+  }
+
+  async function preGameOver(explosionAnim: Promise<void>) {
+    if (state !== GameState.Playing) {
+      throw new Error(`Pre Game over called with wrong state ${state}`);
+    }
+    state = GameState.PreGameOver;
 
     gameTime.end();
 
     // Stop spawning bombs
     app.ticker.remove(bombSpawnTick);
 
-    // Clear screen and animate
-    await Promise.all(bombs.map(b => b.explodeNow()));
+    // Waiting for explosion to finish is a little dramatic touch
+    // and also avoid screenshake to misplace the game over screen.
+    await explosionAnim;
+
+    const BOMB_EXPLO_GAP_MS = 100;
+
+    const explosions = bombs
+      .sort((a,b) => b.positionY - a.positionY)
+      .map((bomb, index) => new Promise<void>(resolve => {
+        setTimeout(
+          () => {
+            bomb.explodeNow().then(resolve);
+          },
+          index * BOMB_EXPLO_GAP_MS
+        );
+      }));
+
+    await Promise.all(explosions);
     bombs.length = 0;
 
-    // Retry?
-    gameOverScreen.enable(container);
+    gameOver();
   }
 
   let elapsedTime = 0;
@@ -91,17 +116,20 @@ export function useGameScreen(app: Application) {
     // elapsedMS time still grow, there might be a better solution).
     elapsedTime += Math.min(ticker.elapsedMS, 100);
 
-    if (elapsedTime >= BOMB_SPAWN_INTERVAL_MS) {
-      elapsedTime -= BOMB_SPAWN_INTERVAL_MS;
+    // 60 bomb per minutes, is 1 bomb per second, is 1 bomb every 1000ms
+    // 30 bomb per minutes, 0.5 bomb per second, 1 bomb every 2000ms
+    const bombPerMs = 1000 / (settings.bomb.bombPerMin(gameTime.elapsedTime) / 60);
+
+    if (elapsedTime >= bombPerMs) {
+      // console.debug('bombPerMs ' + bombPerMs);
+      elapsedTime -= bombPerMs;
 
       function onExplode(explosionAnim: Promise<void>) {
         lives--;
         lifeText.text = lives.toString();
         screenShake(container, SCREEN_SHAKE_FORCE, 0.2);
-        if (lives <= 0) {
-          // Waiting for explosion to finish is a little dramatic touch
-          // and also avoid screenshake to misplace the game over screen.
-          explosionAnim.then(() => gameOver());
+        if (lives <= 0 && state === GameState.Playing) {
+          preGameOver(explosionAnim);
         }
       }
 

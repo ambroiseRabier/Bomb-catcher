@@ -44,7 +44,6 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
   // Add screen height to the rectangle to avoid missing collision on fast moving objects.
   const bottom = new Rectangle(0, app.screen.height, app.screen.width, app.screen.height);
 
-  let updateTicker: Ticker;
   let state = BombState.Idle;
   // Fall to the bottom by default
   let fallVector = new Point(0, 1);
@@ -84,7 +83,7 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
     // move out of screen with a bounce, while scaling down a bit (ease fc type log)
     // and a strong rotation
 
-    updateTicker.stop(); // todo: should be a cleanup handled where we add that state initially
+    app.ticker.remove(update);
     container.interactive = false;
 
     // Animate
@@ -151,7 +150,7 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
     state = BombState.Exploding;
 
     // Stop update loop
-    updateTicker.stop();
+    app.ticker.remove(update);
 
     // Too late to "catch" it.
     container.interactive = false;
@@ -204,10 +203,7 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
       sprite.angle = fallAngle - 90;
     }
 
-
-    updateTicker = new Ticker();
-    updateTicker.add(update);
-    updateTicker.start();
+    app.ticker.add(update);
   }
 
   function disable() {
@@ -215,8 +211,8 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
     container.visible = false;
     container.interactive = false;
 
-    // Note: Should only be destroyed once, cannot be re-used as elapsedMS/deltaTime are not resetted on stop().
-    updateTicker.destroy();
+    // Should already be stopped, but just in case.
+    app.ticker.remove(update);
   }
 
 

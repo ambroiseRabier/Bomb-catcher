@@ -23,7 +23,6 @@ export function useGameScreen(app: Application) {
   const container = new Container();
   const lifeText = new Text(TOTAL_LIVES.toString());
   let lives: number;
-  let bombSpawnerTicker: Ticker;
   const bombs: Bomb[] = [];
   let state = GameState.GameOver;
   /**
@@ -72,8 +71,7 @@ export function useGameScreen(app: Application) {
     gameTime.end();
 
     // Stop spawning bombs
-    bombSpawnerTicker.stop();
-    bombSpawnerTicker.destroy();
+    app.ticker.remove(bombSpawnTick);
 
     // Clear screen and animate
     await Promise.all(bombs.map(b => b.explodeNow()));
@@ -81,6 +79,52 @@ export function useGameScreen(app: Application) {
 
     // Retry?
     gameOverScreen.enable(container);
+  }
+
+  let elapsedTime = 0;
+  function bombSpawnTick(ticker: Ticker) {
+    if (lives <= 0) {
+      throw new Error('Unexpected spawning of bomb when lives <= 0');
+    }
+
+    // Math.min fix the issue of alt-tabbing making a lot of bombs spawn at once (PIXIJS pause itself but
+    // elapsedMS time still grow, there might be a better solution).
+    elapsedTime += Math.min(ticker.elapsedMS, 100);
+
+    if (elapsedTime >= BOMB_SPAWN_INTERVAL_MS) {
+      elapsedTime -= BOMB_SPAWN_INTERVAL_MS;
+
+      function onExplode(explosionAnim: Promise<void>) {
+        lives--;
+        lifeText.text = lives.toString();
+        screenShake(container, SCREEN_SHAKE_FORCE, 0.2);
+        if (lives <= 0) {
+          // Waiting for explosion to finish is a little dramatic touch
+          // and also avoid screenshake to misplace the game over screen.
+          explosionAnim.then(() => gameOver());
+        }
+      }
+
+      const bomb = spawnBomb({
+        app,
+        onExplode,
+        diagonal: false,
+        fallTimeSec: settings.bomb.fallTimeSec(gameTime.elapsedTime),
+      });
+      bombs.push(bomb);
+
+      // Small chance of spawning a bomb with a different fall angle
+      const ALSO_SPAWN_DIAGONAL = .25;
+      if (Math.random() < ALSO_SPAWN_DIAGONAL) {
+        const bomb = spawnBomb({
+          app,
+          onExplode,
+          diagonal: true,
+          fallTimeSec: settings.bomb.fallTimeSec(gameTime.elapsedTime),
+        });
+        bombs.push(bomb);
+      }
+    }
   }
 
 
@@ -94,53 +138,7 @@ export function useGameScreen(app: Application) {
 
     lives = TOTAL_LIVES;
     lifeText.text = lives.toString();
-    let elapsedTime = 0;
-    bombSpawnerTicker = new Ticker();
-    bombSpawnerTicker.add((ticker) => {
-      if (lives <= 0) {
-        throw new Error('Unexpected spawning of bomb when lives <= 0');
-      }
-
-      // Math.min fix the issue of alt-tabbing making a lot of bombs spawn at once (PIXIJS pause itself but
-      // elapsedMS time still grow, there might be a better solution).
-      elapsedTime += Math.min(ticker.elapsedMS, 100);
-
-      if (elapsedTime >= BOMB_SPAWN_INTERVAL_MS) {
-        elapsedTime -= BOMB_SPAWN_INTERVAL_MS;
-
-        function onExplode(explosionAnim: Promise<void>) {
-          lives--;
-          lifeText.text = lives.toString();
-          screenShake(container, SCREEN_SHAKE_FORCE, 0.2);
-          if (lives <= 0) {
-            // Waiting for explosion to finish is a little dramatic touch
-            // and also avoid screenshake to misplace the game over screen.
-            explosionAnim.then(() => gameOver());
-          }
-        }
-
-        const bomb = spawnBomb({
-          app,
-          onExplode,
-          diagonal: false,
-          fallTimeSec: settings.bomb.fallTimeSec(gameTime.elapsedTime),
-        });
-        bombs.push(bomb);
-
-        // Small chance of spawning a bomb with a different fall angle
-        const ALSO_SPAWN_DIAGONAL = .25;
-        if (Math.random() < ALSO_SPAWN_DIAGONAL) {
-          const bomb = spawnBomb({
-            app,
-            onExplode,
-            diagonal: true,
-            fallTimeSec: settings.bomb.fallTimeSec(gameTime.elapsedTime),
-          });
-          bombs.push(bomb);
-        }
-      }
-    });
-    bombSpawnerTicker.start();
+    app.ticker.add(bombSpawnTick);
   }
 
   return {

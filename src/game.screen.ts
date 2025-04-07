@@ -69,7 +69,7 @@ export function useGameScreen(app: Application) {
     state = GameState.GameOver;
 
     // Retry?
-    gameOverScreen.enable(container);
+    gameOverScreen.enable(container, gameTime.elapsedTime);
   }
 
   async function preGameOver(explosionAnim: Promise<void>) {
@@ -83,9 +83,7 @@ export function useGameScreen(app: Application) {
     // Stop spawning bombs
     app.ticker.remove(bombSpawnTick);
 
-    // Waiting for explosion to finish is a little dramatic touch
-    // and also avoid screenshake to misplace the game over screen.
-    await explosionAnim;
+
 
     const BOMB_EXPLO_GAP_MS = 100;
 
@@ -100,7 +98,9 @@ export function useGameScreen(app: Application) {
         );
       }));
 
-    await Promise.all(explosions);
+    // Waiting for explosion to finish is a little dramatic touch
+    // and also avoid screenshake to misplace the game over screen.
+    await Promise.all([...explosions, explosionAnim]);
     bombs.length = 0;
 
     gameOver();

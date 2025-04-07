@@ -34,11 +34,11 @@ export function useTitleScreen({app, playClick}: Props) {
       // anim then
       playClick();
     });
-    playBtn.on('mouseover', () => {
-      playBtn.tint = 0x9acd32; // Slightly change color on hover
+    playBtn.on('mouseenter', () => {
+      playBtn.tint = '#EFBF04';
     });
     playBtn.on('mouseout', () => {
-      playBtn.tint = 0xFFFFFF; // Reset tint when no longer hovering
+      playBtn.tint = 0xFFFFFF;
     });
     container.addChild(playBtn);
 

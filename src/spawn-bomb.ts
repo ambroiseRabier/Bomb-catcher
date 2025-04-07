@@ -191,7 +191,7 @@ export function spawnBomb({app, onExplode, diagonal, fallTimeSec}: Props) {
     });
     previousXRandom = rand;
     container.position.x = HORIZONTAL_SPAWN_MARGIN_PX + rand * (app.screen.width - HORIZONTAL_SPAWN_MARGIN_PX*2 - sprite.width);
-    sprite.angle = (Math.random() * 2 - 1) * 20; // visual variation
+    sprite.angle = (Math.random() * 2 - 1) * 15; // visual variation
 
 
     // Move in diagonal

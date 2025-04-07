@@ -1,10 +1,3 @@
-const prodSettings = {
-  bomb: {
-    // Fall time (easier to reason with than pixels per second speed)
-    INITIAL_FALL_TIME_SEC: 6
-  }
-};
-
 // NOTE: Screenshot in GD.md of the curve.
 
 // May be slightly higher due to ceil.
@@ -17,9 +10,12 @@ function h(x: number, a: number, c: number, k: number) {
   return c * (Math.log((a - x) / k) / Math.log(a / k));
 }
 
-// Settings to be used to quickly test something
-const devSettings = {
+/**
+ * Target is a confirmed gamer (FDJ game dev), with short gameplay 1min-2min per run.
+ */
+const prodSettings = {
   bomb: {
+    // Fall time based on screen height (1280) (easier to reason with than pixels per second speed)
     fallTimeSec: (t: number): number => {
       // Desmos
       // g\operatorname{ceil}\left(\frac{h\left(x\right)}{g}\right)
@@ -49,6 +45,14 @@ const devSettings = {
       // Same as falltime
       return compute(t, 1.6, 130, INITIAL_FALL_TIME_SEC, 40);
     }
+  }
+};
+
+// Settings to be used to quickly test something
+const devSettings = {
+  bomb: {
+    fallTimeSec: prodSettings.bomb.fallTimeSec,
+    bombPerMin: prodSettings.bomb.bombPerMin
   }
 };
 

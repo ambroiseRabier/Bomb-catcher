@@ -30,6 +30,7 @@ enum GameState {
 export function useGameScreen(app: Application) {
   let loaded = false;
   let inited = false;
+  // Should be lower than 72px, that is the margin on the background.
   const SCREEN_SHAKE_FORCE = 50; // 25 max on y or x
   const container = new Container();
   let lives: number;
@@ -58,8 +59,6 @@ export function useGameScreen(app: Application) {
     // Background
     background.position.set(app.screen.width / 2, app.screen.height / 2);
     background.anchor.set(0.5);
-    // Small hack on background image so that screen shake doesn't show white borders
-    background.scale.set((app.screen.width + SCREEN_SHAKE_FORCE * 2) / app.screen.width);
     background.filters = [shockwaveFilter];
     container.addChild(background);
 
@@ -69,9 +68,8 @@ export function useGameScreen(app: Application) {
 
     // Sprite needs to be loaded first.
     chest = useChest();
-    // Placing the chest correctly is a pain since I've scaled the background for screenshake,
-    // Should have made the background bigger from the start :/
-    chest.container.position.set(app.screen.width / 2-5, app.screen.height - 75);
+    // Placing the chest correctly +3 and -80, and -64 for the background margin bottom.
+    chest.container.position.set(app.screen.width / 2 + 3, app.screen.height -79 -64);
     container.addChild(chest.container);
 
     // Planes

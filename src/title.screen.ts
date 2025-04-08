@@ -36,7 +36,8 @@ export function useTitleScreen({ app, playClick }: Props) {
       // Anim
       playBtn.visible = false; // no anim for this one
       await Promise.all([
-        gsap.to(background, {y: -300, duration: 2.618, ease: 'power2.out'}),
+        // it is exactly 305 pixel more than 1280 screen.
+        gsap.to(background, {y: -305, duration: 2.618, ease: 'power2.out'}),
         gsap.to(title, {y: title.y-50, alpha: 0, duration: 0.809, ease: 'power2.out'}),
         gsap.to(title.scale, {y: 0.9, x: 0.9, duration: 0.809, ease: 'power2.out'})
       ]);

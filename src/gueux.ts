@@ -3,7 +3,7 @@ import { Container, Point, Rectangle, Sprite } from 'pixi.js';
 import gsap from 'gsap';
 
 
-export function useGueux(app: Rectangle, chestPos: Point) {
+export function useGueux(screen: Rectangle, chestPos: Point) {
   const gueuxA = Sprite.from(assets.game.gueuxA);
   const gueuxB = Sprite.from(assets.game.gueuxB);
   const container = new Container();

@@ -1,11 +1,19 @@
 // Import the html file so that it is added to the bundle.
 import './index.html';
 
-import { Application } from 'pixi.js';
+import { Application, Assets } from 'pixi.js';
 import { setBasicOptions } from './helpers/set-basic-options';
 import { useTitleScreen } from './title.screen';
 import { useGameScreen } from './game.screen';
 
+// https://pixijs.com/8.x/examples/text/from-font
+Assets.addBundle('fonts', {
+  VarelaRound: {
+    src: '/final/font/VarelaRound-Regular.ttf',
+    data: { family: 'VarelaRound' },
+  },
+});
+await Assets.loadBundle('fonts');
 
 const app = new Application();
 await app.init({

@@ -1,5 +1,6 @@
 import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
 import gsap from 'gsap';
+import { buttonStyle } from './text-style';
 
 export function useGameOverScreen({
   app,
@@ -19,12 +20,13 @@ export function useGameOverScreen({
 
 
   const style = new TextStyle({
-    fontFamily: 'Arial',
+    fontFamily: 'VarelaRound',
     fontSize: 72,
     fontWeight: 'bold',
     align: 'center',
-    fill: '#e1dede',
-    stroke: { color: '#d62424', width: 3, join: 'round' },
+    fill: '#cccccc',
+    // stroke in red just doesn't feel good.
+    // stroke: { color: '#bc1a1a', width: 3, join: 'round' },
     dropShadow: {
       color: '#000000',
       blur: 4,
@@ -41,11 +43,8 @@ export function useGameOverScreen({
   });
 
   const retryStyle = new TextStyle({
-    fontFamily: 'Arial',
-    fontSize: 42,
-    fontWeight: 'bold',
-    align: 'center',
-    fill: '#e8e8e8',
+    ...buttonStyle,
+    fontSize: 60,
     wordWrapWidth: app.screen.width * 0.8, // 10% margin each side
   });
 
@@ -53,7 +52,7 @@ export function useGameOverScreen({
   const scoreStrTemplate = "You've accumulated %score% days of treasures.";
   const scoreText = new Text({
     text: scoreStrTemplate,
-    style: { ...retryText, fontWeight: 'normal', fontSize: 32 },
+    style: { ...retryText, fontWeight: 'normal', fontSize: 32, fontFamily: 'VarelaRound' },
   });
 
   background.position.set(0);

@@ -1,14 +1,14 @@
 export const assets = {
   titlescreen: {
-    background: '/final/titlescreen/extended background.png',
-    title: '/final/titlescreen/title.png',
+    background: `${process.env.SUBPATH ?? ''}/final/titlescreen/extended background.png`,
+    title: `${process.env.SUBPATH ?? ''}/final/titlescreen/title.png`,
   },
   game: {
-    background: '/final/game/Background.PNG',
-    bomb: '/final/game/Bombe.PNG',
-    explosion: '/final/game/Explosion.PNG',
-    gueuxA: '/final/game/GueuxA.png',
-    gueuxB: '/final/game/GueuxB.png',
+    background: `${process.env.SUBPATH ?? ''}/final/game/Background.PNG`,
+    bomb: `${process.env.SUBPATH ?? ''}/final/game/Bombe.PNG`,
+    explosion: `${process.env.SUBPATH ?? ''}/final/game/Explosion.PNG`,
+    gueuxA: `${process.env.SUBPATH ?? ''}/final/game/GueuxA.png`,
+    gueuxB: `${process.env.SUBPATH ?? ''}/final/game/GueuxB.png`,
 
     // Use of spritesheet for example, they are good for general performance and also avoid having to fix placement
     // of every single chest here, since I'm not using an level/ui editor.
@@ -17,7 +17,7 @@ export const assets = {
     // frame0000.png has to be unique or will be overridden, without regards for filename it comes from.
     // Even with a single big spritesheet, which is the usual on games, this issue remains in texture packer.
     // I ended up manually updating the jsons.
-    chestSP: '/final/game/chest.sp.json',
-    planeSP: '/final/game/plane.sp.json',
+    chestSP: `${process.env.SUBPATH ?? ''}/final/game/chest.sp.json`,
+    planeSP: `${process.env.SUBPATH ?? ''}/final/game/plane.sp.json`,
   },
 };

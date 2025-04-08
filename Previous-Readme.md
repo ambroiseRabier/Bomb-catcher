@@ -1,3 +1,8 @@
+## 2025 note
+
+Remove the public folder in path when sending it on webserver.
+For https://ambroise-rabier.dev/bomb-catcher/, correct subpath env var is `SUBPATH=/bomb-catcher`
+
 ## Tauri
 
 If you don't need to export as a desktop app, you can remove Tauri dependencies and `src-tauri`,

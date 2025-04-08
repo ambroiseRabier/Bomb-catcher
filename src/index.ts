@@ -9,7 +9,7 @@ import { useGameScreen } from './game.screen';
 // https://pixijs.com/8.x/examples/text/from-font
 Assets.addBundle('fonts', {
   VarelaRound: {
-    src: '/final/font/VarelaRound-Regular.ttf',
+    src: `${process.env.SUBPATH ?? ''}/final/font/VarelaRound-Regular.ttf`,
     data: { family: 'VarelaRound' },
   },
 });

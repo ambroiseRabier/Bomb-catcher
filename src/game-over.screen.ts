@@ -11,13 +11,10 @@ export function useGameOverScreen({
 }) {
   const container = new Container();
   const background = new Graphics();
-  background
-    .rect(0, 0, app.screen.width, app.screen.height)
-    .fill({
-      color: 0x000000,
-      alpha: 0.5,
-    });
-
+  background.rect(0, 0, app.screen.width, app.screen.height).fill({
+    color: 0x000000,
+    alpha: 0.5,
+  });
 
   const style = new TextStyle({
     fontFamily: 'VarelaRound',

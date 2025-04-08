@@ -1,4 +1,3 @@
-
 ## Tauri
 
 If you don't need to export as a desktop app, you can remove Tauri dependencies and `src-tauri`,

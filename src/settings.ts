@@ -56,8 +56,8 @@ const devSettings = {
   alsoSpawnDiagonalProb: prodSettings.alsoSpawnDiagonalProb,
   bomb: {
     // instant fall to test game over screen faster.
-    fallTimeSec: (t: number) => 0.1 + t/10000,//prodSettings.bomb.fallTimeSec,
-    bombPerMin: (t: number) => 6000,// prodSettings.bomb.bombPerMin,
+    fallTimeSec: (t: number) => 0.1 + t / 10000, //prodSettings.bomb.fallTimeSec,
+    bombPerMin: (t: number) => 6000, // prodSettings.bomb.bombPerMin,
   },
 };
 

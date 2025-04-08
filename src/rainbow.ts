@@ -14,8 +14,7 @@ export function useRainbow() {
 
     // Draw the half-circle for this color
     const g = new Graphics();
-    g
-      .arc(0, 0, outerRadius, Math.PI, 0)  // Half circle (PI to 0 radians)
+    g.arc(0, 0, outerRadius, Math.PI, 0) // Half circle (PI to 0 radians)
       .arc(0, 0, innerRadius, 0, Math.PI, true) // Inner arc to close the ring
       .closePath()
       .fill(color);
@@ -33,7 +32,11 @@ export function useRainbow() {
       index = 0;
       bows.forEach((bow, index) => {
         bow.visible = true;
-        gsap.fromTo(bow, {angle: 180}, {angle: 0, duration: 1, delay: (bows.length -1 - index)*0.05, ease: 'none'});
+        gsap.fromTo(
+          bow,
+          { angle: 180 },
+          { angle: 0, duration: 1, delay: (bows.length - 1 - index) * 0.05, ease: 'none' }
+        );
       });
     },
     loseBow() {
@@ -44,14 +47,19 @@ export function useRainbow() {
       const localIndex = index;
       index++;
 
-      gsap.fromTo(bows[localIndex], {alpha: 1}, {
-        duration: 1,
-        alpha: 0,
-        ease: 'power1.inOut',
-        onComplete: () => {
-          bows[localIndex].visible = false;
-          bows[localIndex].alpha = 1;
-      }});
-    }
+      gsap.fromTo(
+        bows[localIndex],
+        { alpha: 1 },
+        {
+          duration: 1,
+          alpha: 0,
+          ease: 'power1.inOut',
+          onComplete: () => {
+            bows[localIndex].visible = false;
+            bows[localIndex].alpha = 1;
+          },
+        }
+      );
+    },
   };
 }

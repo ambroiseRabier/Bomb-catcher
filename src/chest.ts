@@ -1,7 +1,6 @@
 import { AnimatedSprite, Assets } from 'pixi.js';
 import { assets } from './assets';
 
-
 export function useChest() {
   let chest: AnimatedSprite = AnimatedSprite.fromFrames(
     Assets.cache.get(assets.game.chestSP).data.animations['frame']
@@ -19,6 +18,6 @@ export function useChest() {
       if (chest.currentFrame < chest.totalFrames) {
         chest.gotoAndStop(chest.currentFrame + 1);
       }
-    }
+    },
   };
 }

@@ -143,13 +143,16 @@ export function spawnBomb({ app, onExplode, onCatch, diagonal, fallTimeSec }: Pr
       const left = container.position.x - TOUCH_HITBOX.radius < 0;
       if (right || left) {
         fallVector.x *= -1;
-        gsap.to(container.scale, { x: -container.scale.x, duration: 0.15, ease: 'power2.inOut',
+        gsap.to(container.scale, {
+          x: -container.scale.x,
+          duration: 0.15,
+          ease: 'power2.inOut',
           onComplete: () => {
             // There is a small bug where the scale is a decimal, make the bomb hard to click,
             // This doesn't solve the origin of the issue, but should be enough to prevent
             // it from entering screen while wrongly scaled.
             container.scale.x = Math.sign(container.scale.x);
-          }
+          },
         });
       }
     } else {
@@ -162,8 +165,10 @@ export function spawnBomb({ app, onExplode, onCatch, diagonal, fallTimeSec }: Pr
     if (container.position.y > app.screen.height * 0.75 && !alarmUsed) {
       alarmUsed = true;
       // alarm/siren style.
-      alarmAnim = gsap.fromTo(container, { tint: 0xffffff},
-        { tint: 0xff0000, yoyo: true, repeat:-1, duration: 0.33, ease: 'sine.inOut' }
+      alarmAnim = gsap.fromTo(
+        container,
+        { tint: 0xffffff },
+        { tint: 0xff0000, yoyo: true, repeat: -1, duration: 0.33, ease: 'sine.inOut' }
       );
     }
   }
@@ -215,9 +220,7 @@ export function spawnBomb({ app, onExplode, onCatch, diagonal, fallTimeSec }: Pr
     });
     previousXRandom = rand;
     const margin = HORIZONTAL_SPAWN_MARGIN_PX + TOUCH_HITBOX.radius;
-    container.position.x =
-      margin +
-      rand * (app.screen.width - margin * 2);
+    container.position.x = margin + rand * (app.screen.width - margin * 2);
     sprite.angle = (Math.random() * 2 - 1) * 10; // visual variation
 
     // Move in diagonal
@@ -277,6 +280,6 @@ export function spawnBomb({ app, onExplode, onCatch, diagonal, fallTimeSec }: Pr
 
       // Too late to "catch" it.
       container.interactive = false;
-    }
+    },
   };
 }

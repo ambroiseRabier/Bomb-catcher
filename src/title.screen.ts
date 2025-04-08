@@ -20,9 +20,9 @@ export function useTitleScreen({ app, playClick }: Props) {
     const playBtnStyle = new TextStyle({
       ...buttonStyle,
       fontSize: 100,
-      letterSpacing: 6
+      letterSpacing: 6,
     });
-    const playBtn = new Text({ text: 'PLAY', style: playBtnStyle })
+    const playBtn = new Text({ text: 'PLAY', style: playBtnStyle });
 
     // Ideally, positioning is done in some kind of editor.
     background.position.y = 0;
@@ -43,9 +43,9 @@ export function useTitleScreen({ app, playClick }: Props) {
       playBtn.visible = false; // no anim for this one
       await Promise.all([
         // it is exactly 305 pixel more than 1280 screen.
-        gsap.to(background, {y: -305, duration: 2.618, ease: 'power2.out'}),
-        gsap.to(title, {y: title.y-50, alpha: 0, duration: 0.809, ease: 'power2.out'}),
-        gsap.to(title.scale, {y: 0.9, x: 0.9, duration: 0.809, ease: 'power2.out'})
+        gsap.to(background, { y: -305, duration: 2.618, ease: 'power2.out' }),
+        gsap.to(title, { y: title.y - 50, alpha: 0, duration: 0.809, ease: 'power2.out' }),
+        gsap.to(title.scale, { y: 0.9, x: 0.9, duration: 0.809, ease: 'power2.out' }),
       ]);
 
       playClick();

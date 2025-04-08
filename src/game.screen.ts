@@ -73,7 +73,7 @@ export function useGameScreen(app: Application) {
     // Sprite needs to be loaded first.
     chest = useChest();
     // Placing the chest correctly +3 and -80, and -64 for the background margin bottom.
-    chest.container.position.set(app.screen.width / 2 + 3, app.screen.height -79 -64);
+    chest.container.position.set(app.screen.width / 2 + 3, app.screen.height - 79 - 64);
     container.addChild(chest.container);
 
     // Gueux
@@ -82,11 +82,11 @@ export function useGameScreen(app: Application) {
 
     // Planes
     planeSpeedIncrease = usePlane();
-    planeSpeedIncrease.container.position.y = planeSpeedIncrease.container.height/2 + 20;
+    planeSpeedIncrease.container.position.y = planeSpeedIncrease.container.height / 2 + 20;
     planeSpeedIncrease.container.visible = false;
     container.addChild(planeSpeedIncrease.container);
     planeQuantityIncrease = usePlane();
-    planeQuantityIncrease.container.position.y = planeQuantityIncrease.container.height/2 + 40;
+    planeQuantityIncrease.container.position.y = planeQuantityIncrease.container.height / 2 + 40;
     planeQuantityIncrease.container.visible = false;
     container.addChild(planeQuantityIncrease.container);
 
@@ -155,7 +155,7 @@ export function useGameScreen(app: Application) {
       explosionAnim,
       // Also await screenshake duration, in case it take more time than the explosion anim.
       // + margin of 100
-      new Promise(resolve => setTimeout(resolve, SCREEN_SHAKE_DURATION*1000 + 100))
+      new Promise(resolve => setTimeout(resolve, SCREEN_SHAKE_DURATION * 1000 + 100)),
     ]);
 
     gameOver();
@@ -196,7 +196,6 @@ export function useGameScreen(app: Application) {
     }
   }
 
-
   function bombSpawnTick(ticker: Ticker) {
     if (lives <= 0) {
       throw new Error('Unexpected spawning of bomb when lives <= 0');
@@ -220,7 +219,6 @@ export function useGameScreen(app: Application) {
 
       elapsedTime -= bombPerMs;
 
-
       const fallTime = settings.bomb.fallTimeSec(gameTime.elapsedTime);
       if (previousFallTime !== fallTime) {
         previousFallTime = fallTime;
@@ -237,7 +235,7 @@ export function useGameScreen(app: Application) {
         onExplode: (...params) => {
           // Remove the bomb, so that we won't wait for it at pre-gameover anim.
           removeBomb(bomb);
-          onExplode(...params)
+          onExplode(...params);
         },
         onCatch: () => removeBomb(bomb),
         diagonal: false,
@@ -252,7 +250,7 @@ export function useGameScreen(app: Application) {
           onExplode: (...params) => {
             // Remove the bomb, so that we won't wait for it at pre-gameover anim.
             removeBomb(bombDiag);
-            onExplode(...params)
+            onExplode(...params);
           },
           onCatch: () => removeBomb(bombDiag),
           diagonal: true,

@@ -1,6 +1,6 @@
-Done in X hours. 
+Commencé dimanche matin, 06 avril 2025.
 
-Graphics, Game design
+Fait en ~20h.
 
 ## Play
 

@@ -7,7 +7,7 @@ import { assets } from './assets';
  * the difficulty increases.
  */
 export function usePlane() {
-  const PLANE_SIZE_QUICK_FIX = .5; // ideally, this is done on GA side (krita...)
+  const PLANE_SIZE_QUICK_FIX = 0.5; // ideally, this is done on GA side (krita...)
   let plane: AnimatedSprite = AnimatedSprite.fromFrames(
     Assets.cache.get(assets.game.planeSP).data.animations['frame']
   );
@@ -25,7 +25,7 @@ export function usePlane() {
       plane.scale.x = -Math.abs(plane.scale.x);
 
       const move = (ticker: Ticker) => {
-        plane.position.x += app.screen.width * (ticker.deltaMS/1000);
+        plane.position.x += app.screen.width * (ticker.deltaMS / 1000);
         if (plane.position.x > app.screen.width + plane.width) {
           app.ticker.remove(move);
           plane.visible = false;
@@ -40,7 +40,7 @@ export function usePlane() {
       plane.scale.x = Math.abs(plane.scale.x);
 
       const move = (ticker: Ticker) => {
-        plane.position.x -= app.screen.width * (ticker.deltaMS/1000);
+        plane.position.x -= app.screen.width * (ticker.deltaMS / 1000);
         if (plane.position.x < -plane.width) {
           app.ticker.remove(move);
           plane.visible = false;

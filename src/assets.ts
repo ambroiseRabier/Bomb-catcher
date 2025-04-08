@@ -1,6 +1,6 @@
 export const assets = {
   titlescreen: {
-    background: '/placeholders/titlescreen/Background.PNG',
+    background: '/final/titlescreen/extended background.png',
     playBtn: '/placeholders/titlescreen/PlayBtn.PNG',
     title: '/final/titlescreen/title.png',
   },

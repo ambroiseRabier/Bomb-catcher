@@ -1,5 +1,6 @@
 import { Application, Assets, Container, Sprite } from 'pixi.js';
 import { assets } from './assets';
+import gsap from 'gsap';
 
 interface Props {
   app: Application;
@@ -18,6 +19,7 @@ export function useTitleScreen({ app, playClick }: Props) {
     const title = Sprite.from(assets.titlescreen.title);
 
     // Ideally, positioning is done in some kind of editor.
+    background.position.y = 0;
     container.addChild(background);
 
     // Title
@@ -30,8 +32,15 @@ export function useTitleScreen({ app, playClick }: Props) {
     playBtn.position.set(app.screen.width / 2, app.screen.height - 100);
     playBtn.interactive = true;
     playBtn.cursor = 'pointer';
-    playBtn.on('pointerdown', () => {
-      // anim then
+    playBtn.on('pointerdown', async () => {
+      // Anim
+      playBtn.visible = false; // no anim for this one
+      await Promise.all([
+        gsap.to(background, {y: -300, duration: 2.618, ease: 'power2.out'}),
+        gsap.to(title, {y: title.y-50, alpha: 0, duration: 0.809, ease: 'power2.out'}),
+        gsap.to(title.scale, {y: 0.9, x: 0.9, duration: 0.809, ease: 'power2.out'})
+      ]);
+
       playClick();
     });
     playBtn.on('mouseenter', () => {

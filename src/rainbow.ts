@@ -30,6 +30,7 @@ export function useRainbow() {
   return {
     container,
     reset() {
+      index = 0;
       bows.forEach((bow, index) => {
         bow.visible = true;
         gsap.fromTo(bow, {angle: 180}, {angle: 0, duration: 1, delay: (bows.length -1 - index)*0.05, ease: 'none'});

@@ -154,6 +154,8 @@ export function useGameOverScreen({
       animate(score);
     },
     disable() {
+      // reset tint
+      retryText.tint = '#ffffff';
       _parent.removeChild(container);
       container.visible = false;
       container.interactive = false;

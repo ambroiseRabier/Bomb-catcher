@@ -10,6 +10,7 @@ import gsap from 'gsap';
 import { useRainbow } from './rainbow';
 import { useChest } from './chest';
 import { usePlane } from './plane';
+import { useGueux } from './gueux';
 
 const shockwaveFilter = new ShockwaveFilter({
   center: new Point(100, 100),
@@ -32,6 +33,7 @@ export function useGameScreen(app: Application) {
   let inited = false;
   // Should be lower than 72px, that is the margin on the background.
   const SCREEN_SHAKE_FORCE = 50; // 25 max on y or x
+  const SCREEN_SHAKE_DURATION = 0.2;
   const container = new Container();
   let lives: number;
   const bombs: Bomb[] = [];
@@ -53,6 +55,8 @@ export function useGameScreen(app: Application) {
    */
   let planeQuantityIncrease: ReturnType<typeof usePlane>;
 
+  let gueux: ReturnType<typeof useGueux>;
+
   function init() {
     const background = Sprite.from(assets.game.background);
 
@@ -71,6 +75,10 @@ export function useGameScreen(app: Application) {
     // Placing the chest correctly +3 and -80, and -64 for the background margin bottom.
     chest.container.position.set(app.screen.width / 2 + 3, app.screen.height -79 -64);
     container.addChild(chest.container);
+
+    // Gueux
+    gueux = useGueux(app.screen, chest.container.position);
+    container.addChild(gueux.container);
 
     // Planes
     planeSpeedIncrease = usePlane();
@@ -101,6 +109,11 @@ export function useGameScreen(app: Application) {
       throw new Error(`Game over called with wrong state ${state}`);
     }
     state = GameState.GameOver;
+
+    // Safeguard: Reset container position (shouldn't be needed since we wait for screenshake to finish)
+    container.position.set(0);
+
+    gueux.start();
 
     // Retry?
     gameOverScreen.enable(container, gameTime.elapsedTime);
@@ -137,7 +150,13 @@ export function useGameScreen(app: Application) {
 
     // Waiting for explosion to finish is a little dramatic touch
     // and also avoid screenshake to misplace the game over screen.
-    await Promise.all([...explosions, explosionAnim]);
+    await Promise.all([
+      ...explosions,
+      explosionAnim,
+      // Also await screenshake duration, in case it take more time than the explosion anim.
+      // + margin of 100
+      new Promise(resolve => setTimeout(resolve, SCREEN_SHAKE_DURATION*1000 + 100))
+    ]);
 
     gameOver();
   }
@@ -155,7 +174,7 @@ export function useGameScreen(app: Application) {
     if (lives < 2 && lives >= 0) {
       chest.loseLive();
     }
-    screenShake(container, SCREEN_SHAKE_FORCE, 0.2);
+    screenShake(container, SCREEN_SHAKE_FORCE, SCREEN_SHAKE_DURATION);
     shockwaveFilter.center = pos;
     shockwaveFilter.enabled = true;
     gsap.fromTo(
@@ -249,6 +268,9 @@ export function useGameScreen(app: Application) {
       throw new Error(`Game start called with wrong state ${state}`);
     }
     state = GameState.Playing;
+
+    // No need to wait for gueux to be gone to start bombing.
+    gueux.stop();
 
     gameTime.start();
 

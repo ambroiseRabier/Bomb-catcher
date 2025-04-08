@@ -1,7 +1,14 @@
 import { Container } from 'pixi.js';
 import gsap from 'gsap';
 
+// Avoid multiple concurrent screenshakes. That may offset original camera position.
+let active = false;
+
 export function screenShake(cameraContainer: Container, intensity: number, duration: number) {
+  if (!active) {
+    return;
+  }
+
   const originalX = cameraContainer.x;
   const originalY = cameraContainer.y;
 
@@ -18,6 +25,7 @@ export function screenShake(cameraContainer: Container, intensity: number, durat
       // Reset to original position
       cameraContainer.x = originalX;
       cameraContainer.y = originalY;
+      active = false;
     },
     duration: duration / 24, // Adjust animation step duration
   });

@@ -6,6 +6,7 @@ import { setBasicOptions } from './helpers/set-basic-options';
 import { useTitleScreen } from './title.screen';
 import { useGameScreen } from './game.screen';
 
+
 const app = new Application();
 await app.init({
   // You should also update tauri.conf.json is you change width or height.

@@ -8,6 +8,9 @@ export const assets = {
     background: '/final/game/Background.PNG',
     bomb: '/final/game/Bombe.PNG',
     explosion: '/final/game/Explosion.PNG',
+    gueuxA: '/final/game/GueuxA.png',
+    gueuxB: '/final/game/GueuxB.png',
+
     // Use of spritesheet for example, they are good for general performance and also avoid having to fix placement
     // of every single chest here, since I'm not using an level/ui editor.
     //

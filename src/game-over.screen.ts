@@ -85,11 +85,6 @@ export function useGameOverScreen({
    */
   let _parent: Container;
 
-  // todo animations
-  // fade in of background,
-  // and game over falls from the sky, heavily.
-  // score shows immediately bellow
-  // after a second or two, show "try again ?" button
   function animate(score: number) {
     gsap.fromTo(container, { alpha: 0 }, { alpha: 1, duration: 0.1 });
     gsap

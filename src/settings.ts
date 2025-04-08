@@ -51,6 +51,7 @@ const prodSettings = {
 };
 
 // Settings to be used to quickly test something
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const devSettings = {
   lives: prodSettings.lives,
   alsoSpawnDiagonalProb: prodSettings.alsoSpawnDiagonalProb,
@@ -60,5 +61,7 @@ const devSettings = {
     bombPerMin: (t: number) => 6000, // prodSettings.bomb.bombPerMin,
   },
 };
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
+// Put devSettings here instead for quick tests.
 export default prodSettings;

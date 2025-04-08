@@ -8,7 +8,7 @@ import { assets } from './assets';
  */
 export function usePlane() {
   const PLANE_SIZE_QUICK_FIX = 0.5; // ideally, this is done on GA side (krita...)
-  let plane: AnimatedSprite = AnimatedSprite.fromFrames(
+  const plane: AnimatedSprite = AnimatedSprite.fromFrames(
     Assets.cache.get(assets.game.planeSP).data.animations['frame']
   );
 

@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Point, Sprite, Text, Ticker } from 'pixi.js';
+import { Application, Assets, Container, Point, Sprite, Ticker } from 'pixi.js';
 import { Bomb, spawnBomb } from './spawn-bomb';
 import { assets } from './assets';
 import { useGameOverScreen } from './game-over.screen';
@@ -100,8 +100,6 @@ export function useGameScreen(app: Application) {
       gameStart();
     },
   });
-
-  // todo: Math fc to increase diff, and change the curve to steps. with a max playtime defined ?
 
   async function gameOver() {
     // Catch errors early.

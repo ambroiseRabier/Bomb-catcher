@@ -30,6 +30,8 @@ app.canvas.style.height = 'min(1280px, 100vh)';
 setBasicOptions(app);
 document.body.appendChild(app.canvas);
 
+// eslint is wrong here, it is assigned later.
+// eslint-disable-next-line prefer-const
 let gameScreenLoad: Promise<unknown>;
 const gameScreen = useGameScreen(app);
 const titleScreen = useTitleScreen({

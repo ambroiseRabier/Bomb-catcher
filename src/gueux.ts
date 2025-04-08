@@ -24,7 +24,7 @@ export function useGueux(screen: Rectangle, chestPos: Point) {
 
     // towards the chest (a bit slow and hesitant)
     // Note: haven't found how to target nested properties :/, since rough is random, this will give slightly incorrect results
-    gsap.to(gueux.scale, { x: 0.8, y: 0.8, duration: 3, ease: `none` });
+    gsap.to(gueux.scale, { x: 0.8, y: 0.8, duration: 3, ease: 'none' });
     await gsap.to(gueux, {
       x: chestPos.x + (Math.random() - 0.5) * 200,
       y: chestPos.y + Math.random() * 50, // random for slight visual variation
@@ -40,12 +40,12 @@ export function useGueux(screen: Rectangle, chestPos: Point) {
     });
 
     // towards the bottom edge (moving fast!)
-    gsap.to(gueux.scale, { x: 1, y: 1, duration: 1, ease: `back.in(1)` });
+    gsap.to(gueux.scale, { x: 1, y: 1, duration: 1, ease: 'back.in(1)' });
     await gsap.to(gueux, {
       x: randomBottomXPos(),
       y: bottomYPosOutSideScreen, // random for slight visual variation
       duration: 1,
-      ease: `back.in(1)`,
+      ease: 'back.in(1)',
     });
 
     gueux.scale.set(1);

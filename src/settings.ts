@@ -15,6 +15,7 @@ function h(x: number, a: number, c: number, k: number) {
  */
 const prodSettings = {
   lives: 9,
+  alsoSpawnDiagonalProb: 0.25,
   bomb: {
     // Fall time based on screen height (1280) (easier to reason with than pixels per second speed)
     fallTimeSec: (t: number): number => {
@@ -52,10 +53,11 @@ const prodSettings = {
 // Settings to be used to quickly test something
 const devSettings = {
   lives: prodSettings.lives,
+  alsoSpawnDiagonalProb: prodSettings.alsoSpawnDiagonalProb,
   bomb: {
     fallTimeSec: prodSettings.bomb.fallTimeSec,
     bombPerMin: prodSettings.bomb.bombPerMin,
   },
 };
 
-export default devSettings;
+export default prodSettings;

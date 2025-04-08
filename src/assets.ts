@@ -2,7 +2,7 @@ export const assets = {
   titlescreen: {
     background: '/placeholders/titlescreen/Background.PNG',
     playBtn: '/placeholders/titlescreen/PlayBtn.PNG',
-    title: '/placeholders/titlescreen/Title.PNG',
+    title: '/final/titlescreen/title.png',
   },
   game: {
     background: '/final/game/Background.PNG',

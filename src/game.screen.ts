@@ -121,6 +121,10 @@ export function useGameScreen(app: Application) {
 
     const BOMB_EXPLO_GAP_MS = 100;
 
+    bombs.forEach(bomb => {
+      bomb.freeze();
+    });
+
     const explosions = bombs
       .sort((a, b) => b.positionY - a.positionY)
       .map(
@@ -131,11 +135,11 @@ export function useGameScreen(app: Application) {
             }, index * BOMB_EXPLO_GAP_MS);
           })
       );
+    bombs.length = 0;
 
     // Waiting for explosion to finish is a little dramatic touch
     // and also avoid screenshake to misplace the game over screen.
     await Promise.all([...explosions, explosionAnim]);
-    bombs.length = 0;
 
     gameOver();
   }
@@ -143,6 +147,39 @@ export function useGameScreen(app: Application) {
   let elapsedTime = 0;
   let previousBombPerMin = settings.bomb.bombPerMin(0); // already ceiled in formula
   let previousFallTime = settings.bomb.fallTimeSec(0); // already ceiled in formula
+
+  function onExplode(explosionAnim: Promise<void>, pos: Point) {
+    lives--;
+    // max 7 bows to remove.
+    if (lives <= 8 && lives >= 2) {
+      rainbow.loseBow();
+    }
+    if (lives < 2 && lives >= 0) {
+      chest.loseLive();
+    }
+    screenShake(container, SCREEN_SHAKE_FORCE, 0.2);
+    shockwaveFilter.center = pos;
+    shockwaveFilter.enabled = true;
+    gsap.fromTo(
+      shockwaveFilter,
+      { time: 0 },
+      {
+        time: 1,
+        duration: 1,
+        ease: 'power2.out',
+        onComplete: () => {
+          shockwaveFilter.time = 0;
+          shockwaveFilter.enabled = false;
+        },
+      }
+    );
+
+    if (lives <= 0) {
+      preGameOver(explosionAnim);
+    }
+  }
+
+
   function bombSpawnTick(ticker: Ticker) {
     if (lives <= 0) {
       throw new Error('Unexpected spawning of bomb when lives <= 0');
@@ -152,6 +189,7 @@ export function useGameScreen(app: Application) {
     // elapsedMS time still grow, there might be a better solution).
     elapsedTime += Math.min(ticker.elapsedMS, 100);
 
+    // Note: this has no catchup mechanism, can spawn max 1 bomb per tick.
     // 60 bomb per minutes, is 1 bomb per second, is 1 bomb every 1000ms
     // 30 bomb per minutes, 0.5 bomb per second, 1 bomb every 2000ms
     const bombPerMs = 1000 / (settings.bomb.bombPerMin(gameTime.elapsedTime) / 60);
@@ -165,38 +203,6 @@ export function useGameScreen(app: Application) {
 
       elapsedTime -= bombPerMs;
 
-      function onExplode(explosionAnim: Promise<void>, pos: Point) {
-        // Remove the bomb, so that we won't wait for it at pre-gameover anim.
-        bombs.splice(bombs.indexOf(bomb), 1);
-        lives--;
-        // max 7 bows to remove.
-        if (lives <= 8 && lives >= 2) {
-          rainbow.loseBow();
-        }
-        if (lives < 2 && lives >= 0) {
-          chest.loseLive();
-        }
-        screenShake(container, SCREEN_SHAKE_FORCE, 0.2);
-        shockwaveFilter.center = pos;
-        shockwaveFilter.enabled = true;
-        gsap.fromTo(
-          shockwaveFilter,
-          { time: 0 },
-          {
-            time: 1,
-            duration: 1,
-            ease: 'power2.out',
-            onComplete: () => {
-              shockwaveFilter.time = 0;
-              shockwaveFilter.enabled = false;
-            },
-          }
-        );
-
-        if (lives <= 0 && state === GameState.Playing) {
-          preGameOver(explosionAnim);
-        }
-      }
 
       const fallTime = settings.bomb.fallTimeSec(gameTime.elapsedTime);
       if (previousFallTime !== fallTime) {
@@ -207,26 +213,35 @@ export function useGameScreen(app: Application) {
         // console.debug('fallTime ' + fallTime);
       }
 
+      const removeBomb = (bomb: (typeof bombs)[number]) => bombs.splice(bombs.indexOf(bomb), 1);
+
       const bomb = spawnBomb({
         app,
-        onExplode,
-        onCatch: () => bombs.splice(bombs.indexOf(bomb), 1),
+        onExplode: (...params) => {
+          // Remove the bomb, so that we won't wait for it at pre-gameover anim.
+          removeBomb(bomb);
+          onExplode(...params)
+        },
+        onCatch: () => removeBomb(bomb),
         diagonal: false,
         fallTimeSec: fallTime,
       });
       bombs.push(bomb);
 
       // Small chance of spawning a bomb with a different fall angle
-      const ALSO_SPAWN_DIAGONAL = 0.25;
-      if (Math.random() < ALSO_SPAWN_DIAGONAL) {
-        const bomb = spawnBomb({
+      if (Math.random() < settings.alsoSpawnDiagonalProb) {
+        const bombDiag = spawnBomb({
           app,
-          onExplode,
-          onCatch: () => bombs.splice(bombs.indexOf(bomb), 1),
+          onExplode: (...params) => {
+            // Remove the bomb, so that we won't wait for it at pre-gameover anim.
+            removeBomb(bombDiag);
+            onExplode(...params)
+          },
+          onCatch: () => removeBomb(bombDiag),
           diagonal: true,
           fallTimeSec: fallTime,
         });
-        bombs.push(bomb);
+        bombs.push(bombDiag);
       }
     }
   }

@@ -1,4 +1,4 @@
-import { Application, Container, FillGradient, Graphics, Text, TextStyle } from 'pixi.js';
+import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
 import gsap from 'gsap';
 
 export function useGameOverScreen({
@@ -18,16 +18,12 @@ export function useGameOverScreen({
     });
 
 
-  const fill = new FillGradient(0, 0, 0, 10);
-  fill.addColorStop(0, 0x000000);
-  fill.addColorStop(0, 0xffffff);
-
   const style = new TextStyle({
     fontFamily: 'Arial',
     fontSize: 72,
     fontWeight: 'bold',
     align: 'center',
-    fill: { fill }, // fillGradientType for dir
+    fill: '#e1dede',
     stroke: { color: '#d62424', width: 3, join: 'round' },
     dropShadow: {
       color: '#000000',

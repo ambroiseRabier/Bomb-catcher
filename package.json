@@ -45,7 +45,6 @@
     "webpack"
   ],
   "author": "Ambroise Rabier",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/ambroiseRabier/pixijs-webpack-ts-starter/issues"
   },

@@ -121,6 +121,7 @@ export function spawnBomb({ app, onExplode, onCatch, diagonal, fallTimeSec }: Pr
   }
 
   let alarmUsed = false;
+  let alarmAnim: GSAPTween;
 
   function update() {
     // update hitbox position.
@@ -142,7 +143,14 @@ export function spawnBomb({ app, onExplode, onCatch, diagonal, fallTimeSec }: Pr
       const left = container.position.x - TOUCH_HITBOX.radius < 0;
       if (right || left) {
         fallVector.x *= -1;
-        gsap.to(container.scale, { x: -container.scale.x, duration: 0.15, ease: 'power2.inOut' });
+        gsap.to(container.scale, { x: -container.scale.x, duration: 0.15, ease: 'power2.inOut',
+          onComplete: () => {
+            // There is a small bug where the scale is a decimal, make the bomb hard to click,
+            // This doesn't solve the origin of the issue, but should be enough to prevent
+            // it from entering screen while wrongly scaled.
+            container.scale.x = Math.sign(container.scale.x);
+          }
+        });
       }
     } else {
       // Remove one live
@@ -151,11 +159,11 @@ export function spawnBomb({ app, onExplode, onCatch, diagonal, fallTimeSec }: Pr
       onExplode(explosionAnim, container.position);
     }
 
-    if (container.position.y > app.screen.height * 0.66 && !alarmUsed) {
+    if (container.position.y > app.screen.height * 0.75 && !alarmUsed) {
       alarmUsed = true;
       // alarm/siren style.
-      gsap.fromTo(container, { tint: 0xffffff},
-        { tint: 0xff0000, yoyo: true, repeat:3, duration: 0.33, ease: 'sine.inOut' }
+      alarmAnim = gsap.fromTo(container, { tint: 0xffffff},
+        { tint: 0xff0000, yoyo: true, repeat:-1, duration: 0.33, ease: 'sine.inOut' }
       );
     }
   }
@@ -172,6 +180,13 @@ export function spawnBomb({ app, onExplode, onCatch, diagonal, fallTimeSec }: Pr
 
     // Too late to "catch" it.
     container.interactive = false;
+
+    // Remove alarm anim, or explosion will be colored
+    // Bomb forced to explode at game over won't have alarmAnim set though.
+    if (alarmAnim) {
+      alarmAnim.kill();
+      container.tint = 0xffffff;
+    }
 
     // Animate
     sprite.visible = false;
@@ -235,9 +250,6 @@ export function spawnBomb({ app, onExplode, onCatch, diagonal, fallTimeSec }: Pr
     app.ticker.remove(update);
   }
 
-  // random start position, angle
-  // difficulty increase (as param of useBomb?)
-  // state explode
   // trail renderer
   // sound?
 
@@ -247,6 +259,7 @@ export function spawnBomb({ app, onExplode, onCatch, diagonal, fallTimeSec }: Pr
     },
     /**
      * Explode if currently falling, safe to call.
+     * Won't trigger onExplode callback.
      */
     explodeNow: () => {
       if (state === BombState.Falling) {
@@ -254,5 +267,16 @@ export function spawnBomb({ app, onExplode, onCatch, diagonal, fallTimeSec }: Pr
       }
       return Promise.resolve();
     },
+    /**
+     * Since pregamover anim add some delay in explodeNow call, we don't want any bomb to get clicked
+     * or to hit the ground an explode, which would mess up the animation.
+     */
+    freeze() {
+      // Stop update loop
+      app.ticker.remove(update);
+
+      // Too late to "catch" it.
+      container.interactive = false;
+    }
   };
 }

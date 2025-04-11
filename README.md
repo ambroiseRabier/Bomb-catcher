@@ -1,3 +1,7 @@
+![menu.jpg](readme-assets/menu.jpg)
+![game.jpg](readme-assets/game.jpg)
+![tryagain.jpg](readme-assets/tryagain.jpg)
+
 # Bomb catcher
 
 ## Instructions du test
@@ -71,6 +75,11 @@ Temps de jeu et score: Le passage des avions permet au joueur de se repérer dan
 Vies restantes: Afin d'éviter d'afficher des chiffres et nourrir le thème, des arc-en-ciels (7 couleurs) 
 combiné à 3 états du coffre permettent d'afficher 9 vies de manière plus subtile.
 
+### Problèmes connues
+
+L'avion donne envie d'être cliqué, il pourrait être remplacé par un changement
+dans le background, par exemple des trébuchets apparaissant sur les collines, ce
+qui serait en plus moins anachronique. Mais plus long en GA.
 
 ## GA
 
@@ -90,6 +99,8 @@ Le processus mérite peaufinage, l'idéal étant que en un click de Krita et de 
 
 
 ## Améliorations possible
+
+Note importante: Les instructions précisent de ne pas implémenter de "bonus" en game design.
 
 Prog:
 - Un éditeur visuel pour définir le placement initial des assets réduirait considérablement
@@ -114,6 +125,7 @@ GD:
 - Des choses moins originales, générique :
   - Variation dans le type de bombes. (taille, trajet, division sur click, deux clicks, bomb à ne pas clicker, etc)
   - Niveaux ou points de sauvegarde.
+- L'arc-en-ciel sert de bouclier et bloque les bombes (idée initiale de l'arc-en-ciel).
 
 GA:
 - Génération des assets plus facile, en deux click.

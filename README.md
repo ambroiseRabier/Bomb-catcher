@@ -1,6 +1,8 @@
-![menu.jpg](readme-assets/menu.jpg)
-![game.jpg](readme-assets/game.jpg)
-![tryagain.jpg](readme-assets/tryagain.jpg)
+<p align="center">
+  <img src="readme-assets/menu.jpg" alt="Menu" width="30%" style="margin: 0 10px;">
+  <img src="readme-assets/game.jpg" alt="Game" width="30%" style="margin: 0 10px;">
+  <img src="readme-assets/tryagain.jpg" alt="Try Again" width="30%" style="margin: 0 10px;">
+</p>
 
 # Bomb catcher
 
